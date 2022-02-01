@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
@@ -13,10 +15,13 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * project.
  */
 public class Robot extends TimedRobot {
+  
+  public static drivehumphrey drivehumphrey = new drivehumphrey();
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+  
   @Override
   public void robotInit() {}
 
@@ -30,7 +35,13 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    drivehumphrey.driveleft(0.5);
+    
+
+
+
+  }
 
   @Override
   public void teleopPeriodic() {}
