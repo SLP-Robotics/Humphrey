@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
@@ -10,11 +10,11 @@ public class drivehumphrey {
     WPI_VictorSPX leftMotor2;
 
     public void drivehumphrey() {
-        rightMotor1 = new WPI_VictorSPX(1);
-        rightMotor2 = new WPI_VictorSPX(2);
+        rightMotor1 = new WPI_VictorSPX(0);
+        rightMotor2 = new WPI_VictorSPX(1);
 
-        leftMotor1 = new WPI_VictorSPX(3);
-        leftMotor2 = new WPI_VictorSPX(4);
+        leftMotor1 = new WPI_VictorSPX(0);
+        leftMotor2 = new WPI_VictorSPX(1);
 
         rightMotor2.follow(rightMotor1);
         leftMotor2.follow(leftMotor1);
@@ -22,7 +22,7 @@ public class drivehumphrey {
         //lol
 
     }
-
+    
     public void driveleft(double speed) {
         leftMotor1.set(ControlMode.PercentOutput, speed);
 
