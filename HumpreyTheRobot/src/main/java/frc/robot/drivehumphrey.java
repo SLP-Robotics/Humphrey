@@ -19,6 +19,8 @@ public class drivehumphrey {
         rightMotor2.follow(rightMotor1);
         leftMotor2.follow(leftMotor1);
 
+        //lol
+
     }
 
     public void driveleft(double speed) {
