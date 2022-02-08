@@ -37,9 +37,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    drivehumphrey.driveleft(0.5);
-    
-
+    drivehumphrey.drive(0.5,0.5);
 
 
   }
@@ -59,3 +57,9 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {}
 }
+
+
+
+
+
+
