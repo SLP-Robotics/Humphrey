@@ -17,9 +17,9 @@ public class drivehumphrey {
 
     public DifferentialDrive drive = new DifferentialDrive(leftSide, rightSide);
     
-    public void drive (double speed, double rotation) {
+    public void drive(double speed, double rotation) {
         
-        drive.arcadeDrive (speed * 0.75, rotation);
+        drive.arcadeDrive(speed * 0.75, rotation);
 
     }
 }

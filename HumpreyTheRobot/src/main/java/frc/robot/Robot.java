@@ -18,13 +18,16 @@ import frc.robot.subsystems.drivehumphrey;
 public class Robot extends TimedRobot {
   
   public static drivehumphrey drivehumphrey = new drivehumphrey();
+  public RobotContainer m_robotContainer;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+    m_robotContainer = new RobotContainer();
+  }
 
   @Override
   public void robotPeriodic() {}
@@ -38,12 +41,15 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     drivehumphrey.drive(0.5,0.5);
-
+    drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction);
 
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    m_robotContainer.configureButtons();
+    drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction);
+  }
 
   @Override
   public void disabledInit() {}
