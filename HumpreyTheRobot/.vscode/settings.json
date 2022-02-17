@@ -16,14 +16,14 @@
   },
   "java.test.config": [
     {
-      "name": "WPIlibUnitTests",
-      "workingDirectory": "${workspaceFolder}/build/jni/release",
-      "vmargs": [ "-Djava.library.path=${workspaceFolder}/build/jni/release" ],
-      "env": {
-        "LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release" ,
-        "DYLD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release"
-      }
+        "name": "WPIlibUnitTests",
+        "workingDirectory": "${workspaceFolder}/build/tmp/jniExtractDir",
+        "vmargs": [ "-Djava.library.path=${workspaceFolder}/build/tmp/jniExtractDir" ],
+        "env": { "LD_LIBRARY_PATH": "${workspaceFolder}/build/tmp/jniExtractDir" ,
+          "DYLD_LIBRARY_PATH": "${workspaceFolder}/build/tmp/jniExtractDir" }
+        
     },
   ],
   "java.test.defaultConfig": "WPIlibUnitTests"
+  
 }
