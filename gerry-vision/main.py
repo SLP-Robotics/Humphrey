@@ -9,13 +9,22 @@ from utils.torch_utils import select_device, time_sync
 from PIL import Image, ImageColor
 
 # start video stream capture
-vcap = cv2.VideoCapture(0)
-
+vcap = cv2.VideoCapture('test.mp4')
+path = 'C:/Users/jonas/yolov5/runs/train/exp10/weights/best.pt'
 # import desired model
-model = torch.hub.load('', 'custom', path='C:/Users/jonas/yolov5/runs/train/exp10/weights/best.pt', source='local')
-model.conf = 0.6
+model = torch.hub.load('', 'custom', path=path, source='local')
+model.conf = 0.65
+lengthint = 0
+detections = {}
+runs = 0
 def processing():
     while (True):
+        global runs
+        global detections
+        global lengthint
+        lengthint = 0
+        detections_previous = detections
+        detections = {}
         global model
         # pull video frame-by-frame
         ret, frame = vcap.read()
@@ -35,18 +44,32 @@ def processing():
 
         length = len(results.xyxy[0])
 
+        print('debug')
         # get results
         if results.xyxy[0].size()[0] == 0:
             print('no results')
         else:
-            detections = {}
             # split results into separate variables
             for xmin, ymin, xmax, ymax, conf, c in results.xyxy[0]:
                 xycenter = (xmin.item() + xmax.item())/2, (ymin.item() + ymax.item())/2
                 centervis = cv2.line(frame, (int(xycenter[0]), int(xycenter[1])), (int(xycenter[0]), int(xycenter[1])), (0, 255, 0), 15)
                 cv2.imshow('vis', centervis)
 
-                detections.update({'class' : c})
+                print(detections)
+
+                if xycenter[0] > 160:
+
+
+
+
+
+                if runs > 1:
+                    detections_previous = detections
+                    closest = min(detections_previous[int(lengthint)],
+                                  key=lambda x: abs(x - detections[int(lengthint)]))
+                    print(closest)
+                lengthint += 1
+        runs += 1
 
 
         #except:
