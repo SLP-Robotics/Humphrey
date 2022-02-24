@@ -40,8 +40,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    drivehumphrey.drive(0.5,0.5);
-    drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction);
+    System.out.println("starting teleop");
 
   }
 
@@ -61,7 +60,10 @@ public class Robot extends TimedRobot {
   public void testInit() {}
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    m_robotContainer.configureButtons();
+    drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction);
+  }
 }
 
 

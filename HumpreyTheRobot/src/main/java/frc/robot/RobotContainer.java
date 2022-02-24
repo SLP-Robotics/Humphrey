@@ -15,7 +15,6 @@ public class RobotContainer {
     }
 
     public void configureButtons(){
-        left.getY();
         speed = left.getY();
         direction = left.getX();
     }
