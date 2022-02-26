@@ -20,6 +20,10 @@ public class Robot extends TimedRobot {
   
   public static drivehumphrey drivehumphrey = new drivehumphrey();
   public RobotContainer m_robotContainer;
+  public int autoRuns = 0;
+  public static final double reverseTimeS = 5;
+  public static final double autonomousPeriodTimeS = 0.02;
+  public static final double autonomousReverseCycles = reverseTimeS / autonomousPeriodTimeS;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -36,10 +40,22 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {}
 
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    System.out.println("autoinit");
+    autoRuns = 0;
+  }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    autoRuns += 1;
+    if (autoRuns <= autonomousReverseCycles) {
+      drivehumphrey.drive(0.5, 0);
+    }
+    else {
+      drivehumphrey.drive(0, 0);
+    }
+
+  }
 
   @Override
   public void teleopInit() {

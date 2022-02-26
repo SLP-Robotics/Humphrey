@@ -19,7 +19,7 @@ public class drivehumphrey {
     
     public void drive(double speed, double rotation) {
         System.out.println(speed); // debugging
-        drive.arcadeDrive(speed * 0.5, rotation * 0.5);
+        drive.arcadeDrive(speed * 0.75, rotation * -0.5);
 
     }
 }
