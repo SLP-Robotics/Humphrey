@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    drivehumphrey.rightSide.setInverted(true);
+    drivehumphrey.leftSide.setInverted(true);
   }
 
   @Override
