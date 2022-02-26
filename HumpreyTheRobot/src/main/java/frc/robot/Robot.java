@@ -49,7 +49,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     autoRuns += 1;
     if (autoRuns <= autonomousReverseCycles) {
-      drivehumphrey.drive(0.5, 0);
+      drivehumphrey.drive(0.75, 0);
     }
     else {
       drivehumphrey.drive(0, 0);
