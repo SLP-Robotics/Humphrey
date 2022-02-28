@@ -1,1 +1,1 @@
-If the code errors in the vscode command runner, just run ```echo %path%``` in the Windows command line. I don't know why this fixes it, but it works.
+If you are experiencing a WpiHalJni missing error in the VSCode command runner, make sure you're running the "Desktop Debug" build command, not the "Main" command.
