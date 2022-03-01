@@ -1,5 +1,7 @@
 import torch
 import cv2
+import os
+import numpy as np
 from models.common import DetectMultiBackend
 from utils.datasets import IMG_FORMATS, VID_FORMATS, LoadImages, LoadStreams
 from utils.general import (LOGGER, check_file, check_img_size, check_imshow, check_requirements, colorstr,
@@ -9,28 +11,46 @@ from utils.torch_utils import select_device, time_sync
 from PIL import Image, ImageColor
 
 # start video stream capture
-vcap = cv2.VideoCapture('test.mp4')
-path = 'C:/Users/jonas/yolov5/runs/train/exp10/weights/best.pt'
+vcap = cv2.VideoCapture('humphreyvisionscaled.mp4')
+path = 'C:/Users/jonas/Documents/GitHub/Humphrey/gerry-vision/visionmodels/v3.pt'
 # import desired model
 model = torch.hub.load('', 'custom', path=path, source='local')
+
+# define variables
 model.conf = 0.65
-lengthint = 0
+length_int = 0
 detections = {}
 runs = 0
+selected_color = '0'
+object_colorclass = '0'
+
+size = (320, 240)
+
+# image processing loop
 def processing():
+    global vcap
     while (True):
+        # make variables global
         global runs
         global detections
-        global lengthint
-        lengthint = 0
+        global length_int
+        global selected_color
+        global object_colorclass
+        global model
+        # reset object count every frame
+        length_int = 0  # debugging
+
+        # set detections from last frame as previous detections
         detections_previous = detections
         detections = {}
-        global model
         # pull video frame-by-frame
         ret, frame = vcap.read()
 
         # display the current frame
         cv2.imshow("frame", frame)
+
+        width = frame.shape[1]
+
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         # inference
         results = model(frame_rgb)
@@ -40,40 +60,50 @@ def processing():
 
         results_bgr = cv2.cvtColor(results.imgs[0], cv2.COLOR_RGB2BGR)
 
-        cv2.imshow('', results_bgr)
-
         length = len(results.xyxy[0])
 
-        print('debug')
         # get results
         if results.xyxy[0].size()[0] == 0:
-            print('no results')
+            print('')
         else:
             # split results into separate variables
+            # all of the following code is likely going to be heavily modified
             for xmin, ymin, xmax, ymax, conf, c in results.xyxy[0]:
-                xycenter = (xmin.item() + xmax.item())/2, (ymin.item() + ymax.item())/2
-                centervis = cv2.line(frame, (int(xycenter[0]), int(xycenter[1])), (int(xycenter[0]), int(xycenter[1])), (0, 255, 0), 15)
-                cv2.imshow('vis', centervis)
+                # calculate center of every object
+                xy_center = (xmin.item() + xmax.item()) / 2, (ymin.item() + ymax.item()) / 2
+                # visualize the center of the object with a green dot
+                center_vis = cv2.line(frame, (int(xy_center[0]), int(xy_center[1])), (int(xy_center[0]), int(xy_center[1])),
+                                      (0, 255, 0), 15)
+                # display combined images
+                combined_images = np.concatenate((results_bgr, center_vis), axis=1)
+                cv2.imshow('results + center_vis', combined_images)
 
-                print(detections)
+                # sort objects by class into a more readable format
+                if c == 0:
+                    object_colorclass = 'blue'
 
-                if xycenter[0] > 160:
+                if c == 1:
+                    object_colorclass = 'bumper'
 
+                if c == 2:
+                    object_colorclass = 'red'
 
+                # create three sections on the screen and print "left", "center", and "right" based on where the selected object is on the screen
+                if xy_center[0] > 0 and xy_center[0] < 80 and object_colorclass == selected_color:
+                    print('left')
+                elif xy_center[0] > 80 and xy_center[0] < 160 and object_colorclass == selected_color:
+                    print('center')
+                elif xy_center[0] > 160 and xy_center[0] < 240 and object_colorclass == selected_color:
+                    print('right')
 
-
-
-                if runs > 1:
-                    detections_previous = detections
-                    closest = min(detections_previous[int(lengthint)],
-                                  key=lambda x: abs(x - detections[int(lengthint)]))
-                    print(closest)
-                lengthint += 1
+                # currently unused code for tracking the objects to make sure the code follows the same one
+                #if runs > 1:
+                #    detections_previous = detections
+                #    closest = min(detections_previous[int(length_int)],
+                #                  key=lambda x: abs(x - detections[int(length_int)]))
+                #    print(closest)
+                #length_int += 1
         runs += 1
-
-
-        #except:
-        #    print('no results')
 
         if cv2.waitKey(22) & 0xFF == ord('q'):
             vcap.release()
@@ -86,4 +116,30 @@ def processing():
 # Results
 # results.print()  # or .show(), .save(), .crop(), .pandas(), etc.
 
-processing()
+# fancy menu for selecting what cargo to track
+def startup():
+    global selected_color
+    os.system('cls')
+    print("█▀▀ █▀▀ █▀█ █▀█ █▄█ ▄▄ █░█ █ █▀ █ █▀█ █▄░█")
+    print("█▄█ ██▄ █▀▄ █▀▄ ░█░ ░░ ▀▄▀ █ ▄█ █ █▄█ █░▀█")
+    print("------------------------------------------")
+    print("What alliance are you on?")
+    print("1) Blue")
+    print("2) Red")
+    print("3) Quit")
+    alliance_select = input('>')
+    if alliance_select == '1':
+        selected_color = 'blue'
+        os.system('cls')
+        processing()
+
+    if alliance_select == '2':
+        selected_color = 'red'
+        os.system('cls')
+        processing()
+
+    if alliance_select == '3':
+        os.system('cls')
+        quit()
+
+startup()
