@@ -3,16 +3,14 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 public class Intake {
-    WPI_VictorSPX FlippyThingMotor1;
-    WPI_VictorSPX OverTheBumperMotor2;
 
-    public void OverTheBumper() {
-        
-        OverTheBumperMotor2 = new WPI_VictorSPX(2);
-        
+    //change motor names and change values
+    WPI_VictorSPX rightMotor1 = new WPI_VictorSPX(1);
+    WPI_VictorSPX rightMotor2 = new WPI_VictorSPX(2);
+   
         
     
-    }
+    
 
 
 }

@@ -21,7 +21,7 @@ public class Robot extends TimedRobot {
   public static drivehumphrey drivehumphrey = new drivehumphrey();
   public RobotContainer m_robotContainer;
   public int autoRuns = 0;
-  public static final double reverseTimeS = 5;
+  public static final double reverseTimeS = 3;
   public static final double autonomousPeriodTimeS = 0.02;
   public static final double autonomousReverseCycles = reverseTimeS / autonomousPeriodTimeS;
   /**
@@ -65,8 +65,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    m_robotContainer.configureButtons();
-    drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction);
+    m_robotContainer.readButtons();
+    if(m_robotContainer.boostEnabled) {
+      drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction);
+    }
+    else{
+      drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction);
+    }
   }
 
   @Override
@@ -80,7 +85,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    m_robotContainer.configureButtons();
+    m_robotContainer.readButtons();
     drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction);
   }
 }
