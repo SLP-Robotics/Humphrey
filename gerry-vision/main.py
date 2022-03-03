@@ -2,6 +2,7 @@ import torch
 import cv2
 import os
 import numpy as np
+import base64
 from models.common import DetectMultiBackend
 from utils.datasets import IMG_FORMATS, VID_FORMATS, LoadImages, LoadStreams
 from utils.general import (LOGGER, check_file, check_img_size, check_imshow, check_requirements, colorstr,
@@ -9,12 +10,70 @@ from utils.general import (LOGGER, check_file, check_img_size, check_imshow, che
 from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device, time_sync
 from PIL import Image, ImageColor
+import sys
+import time
+import random
+from playsound import playsound
+import pickle
+import threading
+from networktables import NetworkTables
 
 # start video stream capture
-vcap = cv2.VideoCapture('humphreyvisionscaled.mp4')
+vcap = cv2.VideoCapture('humphreyvision.mp4')
 path = 'C:/Users/jonas/Documents/GitHub/Humphrey/gerry-vision/visionmodels/v3.pt'
 # import desired model
 model = torch.hub.load('', 'custom', path=path, source='local')
+selected_algorithm = 'none'
+largest_item_int = 0
+closest_cargo = []
+
+cond = threading.Condition()
+notified = [False]
+
+
+def network_table_opt(using_network_tables):
+    if using_network_tables:
+        def connection_listener(connected, info):
+            print(info, '; Connected=%s' % connected)
+            with cond:
+                notified[0] = True
+                cond.notify()
+
+        NetworkTables.initialize(server='10.82.34.2')
+        NetworkTables.addConnectionListener(connection_listener, immediateNotify=True)
+
+        with cond:
+            print("Waiting")
+            if not notified[0]:
+                cond.wait()
+    else:
+        print('NetworkTables is not connected')
+
+
+sd = NetworkTables.getDefault()
+
+nt_table = sd.getTable('gerry-vision')
+
+def maximumNum(prov_list):
+    global closest_cargo
+    global largest_item_int
+    max = prov_list[0]
+
+    for x in prov_list:
+        if x > max:
+            max = x
+            largest_item_int += 1
+
+    closest_cargo = [max, largest_item_int]
+
+
+def algorithm(opt):
+    global selected_algorithm
+    if opt == 'size':
+        selected_algorithm = 'size'
+    if opt == 'smart':
+        selected_algorithm = 'smart'
+
 
 # define variables
 model.conf = 0.65
@@ -25,10 +84,16 @@ selected_color = '0'
 object_colorclass = '0'
 
 size = (320, 240)
+size_xymid_blue = []
+size_xymid_red = []
+size_xymid_bumper = []
+split_size = []
+split_xymid = []
+
 
 # image processing loop
 def processing():
-    global vcap
+    global vcap, center_vis
     while (True):
         # make variables global
         global runs
@@ -37,7 +102,20 @@ def processing():
         global selected_color
         global object_colorclass
         global model
-        # reset object count every frame
+        global size_xymid_red
+        global size_xymid_bumper
+        global size_xymid_blue
+        global selected_algorithm
+        global split_size
+        global split_xymid
+        global largest_item_int
+        # reset object variables every frame
+        largest_item_int = 0
+        split_size = []
+        split_xymid = []
+        size_xymid_red = []
+        size_xymid_bumper = []
+        size_xymid_blue = []
         length_int = 0  # debugging
 
         # set detections from last frame as previous detections
@@ -71,38 +149,89 @@ def processing():
             for xmin, ymin, xmax, ymax, conf, c in results.xyxy[0]:
                 # calculate center of every object
                 xy_center = (xmin.item() + xmax.item()) / 2, (ymin.item() + ymax.item()) / 2
+                # get the size of every object
+                obj_size = (((xmax.item() - xmin.item()) ** 2 + (ymax.item() - ymin.item()) ** 2) ** 0.5)
+
                 # visualize the center of the object with a green dot
-                center_vis = cv2.line(frame, (int(xy_center[0]), int(xy_center[1])), (int(xy_center[0]), int(xy_center[1])),
+                center_vis = cv2.line(frame, (int(xy_center[0]), int(xy_center[1])),
+                                      (int(xy_center[0]), int(xy_center[1])),
                                       (0, 255, 0), 15)
-                # display combined images
-                combined_images = np.concatenate((results_bgr, center_vis), axis=1)
-                cv2.imshow('results + center_vis', combined_images)
 
                 # sort objects by class into a more readable format
                 if c == 0:
+                    size_xymid_blue.append([xy_center, obj_size])
                     object_colorclass = 'blue'
 
                 if c == 1:
+                    size_xymid_bumper.append([xy_center, obj_size])
                     object_colorclass = 'bumper'
 
                 if c == 2:
+                    size_xymid_red.append([xy_center, obj_size])
                     object_colorclass = 'red'
 
-                # create three sections on the screen and print "left", "center", and "right" based on where the selected object is on the screen
-                if xy_center[0] > 0 and xy_center[0] < 80 and object_colorclass == selected_color:
-                    print('left')
-                elif xy_center[0] > 80 and xy_center[0] < 160 and object_colorclass == selected_color:
-                    print('center')
-                elif xy_center[0] > 160 and xy_center[0] < 240 and object_colorclass == selected_color:
-                    print('right')
-
                 # currently unused code for tracking the objects to make sure the code follows the same one
-                #if runs > 1:
+                # if runs > 1:
                 #    detections_previous = detections
                 #    closest = min(detections_previous[int(length_int)],
                 #                  key=lambda x: abs(x - detections[int(length_int)]))
                 #    print(closest)
-                #length_int += 1
+                # length_int += 1
+            if selected_algorithm == 'size':
+                try:
+                    if selected_color == 'blue':
+                        for detected_cargo in size_xymid_blue:
+                            split_size.append(detected_cargo[1])
+                            split_xymid.append(detected_cargo[0])
+
+                        maximumNum(split_size)
+
+                        closestxy = split_xymid[largest_item_int]
+
+                        closest_vis = cv2.line(frame, (int(closestxy[0]), int(closestxy[1])),
+                                               (int(closestxy[0]), int(closestxy[1])), (0, 0, 255), 15)
+
+                        # display combined images
+                        combined_images = np.concatenate((results_bgr, center_vis), axis=1)
+                        cv2.imshow('results + center_vis', combined_images)
+
+                        # create three sections on the screen and print "left", "center", and "right" based on where the selected object is on the screen
+                        if 0 < closestxy[0] < 106.666 and object_colorclass == selected_color:
+                            print('left')
+                        elif 106.666 < closestxy[0] < 213.333 and object_colorclass == selected_color:
+                            print('center')
+                        elif 213.333 < closestxy[0] < 320 and object_colorclass == selected_color:
+                            print('right')
+
+                    elif selected_color == 'red':
+                        for detected_cargo in size_xymid_red:
+                            split_size.append(detected_cargo[1])
+                            split_xymid.append(detected_cargo[0])
+
+                        maximumNum(split_size)
+
+                        closestxy = split_xymid[largest_item_int]
+
+                        closest_vis = cv2.line(frame, (int(closestxy[0]), int(closestxy[1])),
+                                               (int(closestxy[0]), int(closestxy[1])), (255, 0, 0), 15)
+
+                        # display combined images
+                        combined_images = np.concatenate((results_bgr, center_vis), axis=1)
+                        cv2.imshow('results + center_vis', combined_images)
+
+                        # create three sections on the screen and print "left", "center", and "right" based on where the selected object is on the screen
+                        if 0 < closestxy[0] < 106.666 and object_colorclass == selected_color:
+                            print('left')
+                            nt_table.putString('action', 'left')
+                        elif 106.666 < closestxy[0] < 213.333 and object_colorclass == selected_color:
+                            print('center')
+                            nt_table.putString('action', 'center')
+                        elif 213.333 < closestxy[0] < 320 and object_colorclass == selected_color:
+                            print('right')
+                            nt_table.putString('action', 'right')
+
+                except(IndexError):
+                    print('stop')
         runs += 1
 
         if cv2.waitKey(22) & 0xFF == ord('q'):
@@ -110,19 +239,54 @@ def processing():
             cv2.destroyAllWindows()
             print("Video stop")
 
+
 # Inference
 # results = model(img)
 
 # Results
 # results.print()  # or .show(), .save(), .crop(), .pandas(), etc.
-
 # fancy menu for selecting what cargo to track
+try:
+    arg = 'LS1odW1waHJleWlzdGhlcmVhbG5hbWU='
+    byte_msg = arg.encode('ascii')
+    base64_val = base64.b64decode(byte_msg)
+    base64_string = base64_val.decode('ascii')
+    arguments = sys.argv[1]
+    arg2 = 'LS1icnVo'
+    byte_msg2 = arg2.encode('ascii')
+    base64_val2 = base64.b64decode(byte_msg2)
+    base64_string2 = base64_val2.decode('ascii')
+    if arguments == base64_string:
+        flag = 1
+    elif arguments == base64_string2:
+        flag = 2
+    else:
+        flag = 0
+except:
+    flag = 0
+
+
+def header():
+    os.system('cls')
+    if flag == 0:
+        print("█▀▀ █▀▀ █▀█ █▀█ █▄█ ▄▄ █░█ █ █▀ █ █▀█ █▄░█")
+        print("█▄█ ██▄ █▀▄ █▀▄ ░█░ ░░ ▀▄▀ █ ▄█ █ █▄█ █░▀█")
+        print("------------------------------------------")
+    elif flag == 1:
+        print("█░█ █░█ █▀▄▀█ █▀█ █░█ █▀█ █▀▀ █▄█   █▄░█ █▀█ ▀█▀   █▀▄ █▀▀ █▄▄ █▀█ ▄▀█")
+        print("█▀█ █▄█ █░▀░█ █▀▀ █▀█ █▀▄ ██▄ ░█░   █░▀█ █▄█ ░█░   █▄▀ ██▄ █▄█ █▀▄ █▀█")
+        print("----------------------------------------------------------------------")
+    elif flag == 2:
+        print("█▄▄ █▀█ █░█ █░█")
+        print("█▄█ █▀▄ █▄█ █▀█")
+        print("---------------")
+        playsound('bruh.mp3')
+
+
 def startup():
     global selected_color
-    os.system('cls')
-    print("█▀▀ █▀▀ █▀█ █▀█ █▄█ ▄▄ █░█ █ █▀ █ █▀█ █▄░█")
-    print("█▄█ ██▄ █▀▄ █▀▄ ░█░ ░░ ▀▄▀ █ ▄█ █ █▄█ █░▀█")
-    print("------------------------------------------")
+    global flag
+    header()
     print("What alliance are you on?")
     print("1) Blue")
     print("2) Red")
@@ -131,15 +295,230 @@ def startup():
     if alliance_select == '1':
         selected_color = 'blue'
         os.system('cls')
+        header()
+        print('What algorithm should be used?')
+        print('1) Size (recommended)')
+        print('2) Smart (unfinished)')
+        algorithm_select = input('>')
+        if algorithm_select == '1':
+            algorithm('size')
+        if algorithm_select == '2':
+            algorithm('smart')
+        os.system('cls')
+        header()
+        print('Should an NT connection be established?')
+        print('1) Yes')
+        print('2) No')
+        nt_select = input('>')
+        if nt_select == '1':
+            network_table_opt(True)
+        if nt_select == '2':
+            network_table_opt(False)
         processing()
 
     if alliance_select == '2':
         selected_color = 'red'
         os.system('cls')
+        header()
+        print('What algorithm should be used?')
+        print('1) Size (recommended)')
+        print('2) Smart (unfinished)')
+        algorithm_select = input('>')
+        if algorithm_select == '1':
+            algorithm('size')
+        if algorithm_select == '2':
+            algorithm('smart')
+        os.system('cls')
+        header()
+        print('Should an NT connection be established?')
+        print('1) Yes')
+        print('2) No')
+        nt_select = input('>')
+        if nt_select == '1':
+            network_table_opt(True)
+        if nt_select == '2':
+            network_table_opt(False)
         processing()
 
     if alliance_select == '3':
-        os.system('cls')
-        quit()
+        try:
+            os.remove('rick.mp3')
+            os.system('cls')
+            if flag == 2:
+                playsound('bruh.mp3')
+            quit()
+        except:
+            os.system('cls')
+            if flag == 2:
+                playsound('bruh.mp3')
+            quit()
 
-startup()
+
+charstr = ''
+charstr2 = ''
+chardash = ''
+
+
+def char_split(s):
+    return [char for char in s]
+
+
+if flag == 1:
+    chars = char_split('█░█ █░█ █▀▄▀█ █▀█ █░█ █▀█ █▀▀ █▄█   █▄░█ █▀█ ▀█▀   █▀▄ █▀▀ █▄▄ █▀█ ▄▀█')
+    chars_line_2 = char_split('█▀█ █▄█ █░▀░█ █▀▀ █▀█ █▀▄ ██▄ ░█░   █░▀█ █▄█ ░█░   █▄▀ ██▄ █▄█ █▀▄ █▀█')
+    chars_dash_line = char_split('----------------------------------------------------------------------')
+elif flag == 2:
+    chars = char_split('█▄▄ █▀█ █░█ █░█')
+    chars_line_2 = char_split('█▄█ █▀▄ █▄█ █▀█')
+    chars_dash_line = char_split('---------------')
+
+
+def intro():
+    global charstr
+    global charstr2
+    global chardash
+    solved = 0
+    chars_2 = char_split(
+        '█░█ █░█ █▀▄▀█ █▀█ █░█ █▀█ █▀▀ █▄█   █▄░█ █▀█ ▀█▀   █▀▄ █▀▀ █▄▄ █▀█ ▄▀█ █▀█ █▄█ █░▀░█ █▀▀ █▀█ █▀▄ ██▄ ░█░   █░▀█ █▄█ ░█░   █▄▀ ██▄ █▄█ █▀▄ █▀█')
+    chars_dash = char_split('-*')
+    for letter in chars:
+        while solved == 0:
+            time.sleep(0.001)
+            randomletter = random.choice(chars_2)
+            if randomletter == letter:
+                os.system('cls')
+                charstr += randomletter
+                break
+            else:
+                os.system('cls')
+                print(charstr + randomletter)
+                solved == 0
+    for letter in chars_line_2:
+        while solved == 0:
+            time.sleep(0.001)
+            randomletter = random.choice(chars_2)
+            if randomletter == letter:
+                os.system('cls')
+                print(charstr)
+                charstr2 += randomletter
+                break
+            else:
+                os.system('cls')
+                print(charstr)
+                print(charstr2 + randomletter)
+                solved == 0
+    for letter in chars_dash_line:
+        while solved == 0:
+            time.sleep(0.005)
+            randomsymbol = random.choice(chars_dash)
+            if randomsymbol == letter:
+                os.system('cls')
+                print(charstr)
+                print(charstr2)
+                chardash += randomsymbol
+                break
+            else:
+                os.system('cls')
+                print(charstr)
+                print(charstr2)
+                print(chardash + randomsymbol)
+                solved == 0
+    os.system('cls')
+    startup()
+
+
+def cleanup():
+    try:
+        os.remove('music.mp3')
+        startup()
+    except:
+        startup()
+
+
+def egg():
+    try:
+        arg = 'LS1odW1waHJleWlzdGhlcmVhbG5hbWU='
+        byte_msg = arg.encode('ascii')
+        base64_val = base64.b64decode(byte_msg)
+        base64_string = base64_val.decode('ascii')
+        arg2 = 'LS1icnVo'
+        byte_msg2 = arg2.encode('ascii')
+        base64_val2 = base64.b64decode(byte_msg2)
+        base64_string2 = base64_val2.decode('ascii')
+        arg3 = 'LS1ncm91cGltYWdl'
+        byte_msg3 = arg3.encode('ascii')
+        base64_val3 = base64.b64decode(byte_msg3)
+        base64_string3 = base64_val3.decode('ascii')
+        arg4 = 'LS10'
+        byte_msg4 = arg4.encode('ascii')
+        base64_val4 = base64.b64decode(byte_msg4)
+        base64_string4 = base64_val4.decode('ascii')
+        arguments = sys.argv[1]
+        print(arguments)
+        if arguments == base64_string:
+            intro()
+        elif arguments == base64_string2:
+            os.system('pip install yt-dlp')
+            os.system(
+                'yt-dlp --max-filesize 8m --playlist-end 1 -r 5m -x --audio-format mp3 --format bestaudio -o "bruh.%(ext)s" https://www.youtube.com/watch?v=2ZIpFytCSVc')
+            intro()
+        elif arguments == '--r':
+            os.system('pip install yt-dlp')
+            os.system(
+                'yt-dlp --max-filesize 8m --playlist-end 1 -r 5m -x --audio-format mp3 --format bestaudio -o "rick.%(ext)s" https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+            with open('file.pkl', 'rb') as file:
+                global rick_frames
+                rick_frames = pickle.load(file)
+            playsound('rick.mp3', False)
+            time.sleep(0.4)
+            for frame in rick_frames:
+                print(frame)
+                time.sleep(0.04)
+            startup()
+        elif arguments == base64_string3:
+            with open('pic.pkl', 'rb') as file:
+                groupimage = pickle.load(file)
+            print(groupimage)
+            time.sleep(30)
+        elif arguments == base64_string4:
+            animation = ['Loading', 'Loading.', 'Loading..', 'Loading...']
+            title1 = '█▀▀ █▀▀ █▀█ █▀█ █▄█ ▄▄ █░█ █ █▀ █ █▀█ █▄░█'
+            title2 = '█▄█ ██▄ █▀▄ █▀▄ ░█░ ░░ ▀▄▀ █ ▄█ █ █▄█ █░▀█'
+            title_bar = '------------------------------------------'
+            print('Loading...')
+            loadint = 0
+            while loadint < 4:
+                if loadint == 2:
+                    os.startfile('data\scripts\download_requirements.bat')
+                os.system('cls')
+                header()
+                print(animation[0])
+                time.sleep(0.2)
+                os.system('cls')
+                header()
+                print(animation[1])
+                time.sleep(0.2)
+                os.system('cls')
+                header()
+                print(animation[2])
+                time.sleep(0.2)
+                os.system('cls')
+                header()
+                print(animation[3])
+                time.sleep(0.2)
+                loadint += 1
+            time.sleep(8)
+            os.system('cls')
+            header()
+            playsound('music.mp3', False)
+            print("Initializing...")
+            time.sleep(3.2)
+            os.system('python data/scripts/t.py')
+        else:
+            startup()
+        cleanup()
+    except:
+        cleanup()
+
+
+egg()

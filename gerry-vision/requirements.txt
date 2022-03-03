@@ -11,6 +11,7 @@ scipy>=1.4.1
 torch>=1.7.0
 torchvision>=0.8.1
 tqdm>=4.41.0
+playsound==1.2.2
 
 # Logging -------------------------------------
 tensorboard>=2.4.1
@@ -35,3 +36,5 @@ seaborn>=0.11.0
 # pycocotools>=2.0  # COCO mAP
 # roboflow
 thop  # FLOPs computation
+
+pynetworktables~=2021.0.0
