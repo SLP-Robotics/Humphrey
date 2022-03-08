@@ -50,9 +50,7 @@ def network_table_opt(using_network_tables):
         print('NetworkTables is not connected')
 
 
-sd = NetworkTables.getDefault()
-
-nt_table = sd.getTable('gerry-vision')
+sd = NetworkTables.getTable('SmartDashboard')
 
 def maximumNum(prov_list):
     global closest_cargo
@@ -222,13 +220,13 @@ def processing():
                         # create three sections on the screen and print "left", "center", and "right" based on where the selected object is on the screen
                         if 0 < closestxy[0] < 106.666 and object_colorclass == selected_color:
                             print('left')
-                            nt_table.putString('action', 'left')
+                            sd.putNumber('action', 0)
                         elif 106.666 < closestxy[0] < 213.333 and object_colorclass == selected_color:
                             print('center')
-                            nt_table.putString('action', 'center')
+                            sd.putNumber('action', 1)
                         elif 213.333 < closestxy[0] < 320 and object_colorclass == selected_color:
                             print('right')
-                            nt_table.putString('action', 'right')
+                            sd.putNumber('action', 2)
 
                 except(IndexError):
                     print('stop')
