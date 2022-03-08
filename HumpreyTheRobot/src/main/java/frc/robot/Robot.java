@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.subsystems.HumphreyShooter;
 import frc.robot.subsystems.drivehumphrey;
 import edu.wpi.first.cameraserver.CameraServer;
 
@@ -71,6 +72,10 @@ public class Robot extends TimedRobot {
     }
     else{
       drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction);
+    }
+    if(m_robotContainer.shootInitiated) {
+      //TODO: change the shoot input to a look up table
+      HumphreyShooter.shoot(m_robotContainer.inputShooterSpeed);//This right now just sets the variable shooter wheel to the input from the third joystick
     }
   }
 
