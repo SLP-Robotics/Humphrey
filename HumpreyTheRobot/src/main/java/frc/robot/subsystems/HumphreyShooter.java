@@ -17,5 +17,6 @@ public class HumphreyShooter {
 
     public static void shoot(double wheelSpeed){
         drive.tankDrive(constantWheelSpeed, wheelSpeed);
+        System.out.println("shooting: " + constantWheelSpeed + ", " + wheelSpeed);
     }
 }

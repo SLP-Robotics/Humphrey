@@ -24,7 +24,7 @@ public class RobotContainer {
         direction = left.getX();
         boostEnabled = speedBoost.get();
         shootInitiated = shootInitiate.get();
-        inputShooterSpeed = Math.abs(right.getY());
+        inputShooterSpeed = Math.abs(right.getY());//Absolute value to prevent the wheel from spinning backwards which could cause... idk what could happen, but probably not good
     }
 }
 

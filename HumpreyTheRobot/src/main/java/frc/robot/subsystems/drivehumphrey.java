@@ -18,7 +18,7 @@ public class drivehumphrey {
     public DifferentialDrive drive = new DifferentialDrive(leftSide, rightSide);
     
     public void drive(double speed, double rotation) {
-        System.out.println(speed); // debugging
+        //System.out.println(speed); // debugging, not needed anymore
         drive.arcadeDrive(speed, rotation * -0.6);
 
     }
