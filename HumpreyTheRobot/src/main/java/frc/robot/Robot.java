@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.subsystems.drivehumphrey;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
@@ -23,9 +24,32 @@ public class Robot extends TimedRobot {
   public static drivehumphrey drivehumphrey = new drivehumphrey();
   public RobotContainer m_robotContainer;
   public int autoRuns = 0;
-  public static final double reverseTimeS = 3;
+  public static final double reverseTimeS = 0.1;
   public static final double autonomousPeriodTimeS = 0.02;
   public static final double autonomousReverseCycles = reverseTimeS / autonomousPeriodTimeS;
+  NetworkTableInstance inst;
+  NetworkTable table;
+
+  public void autoCargo() {
+    NetworkTableEntry controlActionTable = table.getEntry("action");
+    String action = controlActionTable.getString("none");
+    if(action.equals("stop")) {
+      System.out.println("stop");
+      drivehumphrey.drive(0, 0.6);
+    }
+    else if(action.equals("right")) {
+      System.out.println("right");
+      drivehumphrey.drive(-0.6, 0.6);
+    }
+    else if(action.equals("left")) {
+      System.out.println("left");
+      drivehumphrey.drive(-0.6, -0.6);
+    }
+    else if (action.equals("center")) {
+      System.out.println("center");
+      drivehumphrey.drive(-0.5, 0);
+    }
+  }
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -35,8 +59,8 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_robotContainer = new RobotContainer();
     drivehumphrey.leftSide.setInverted(true);
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    NetworkTable table = inst.getTable("vision");
+    inst = NetworkTableInstance.getDefault();
+    table = inst.getTable("SmartDashboard");
   }
 
   @Override
@@ -57,7 +81,9 @@ public class Robot extends TimedRobot {
     else {
       drivehumphrey.drive(0, 0);
     }
-
+    if (autoRuns >= autonomousReverseCycles) {
+      autoCargo();
+    }
   }
 
   @Override

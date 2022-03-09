@@ -18,8 +18,10 @@ import pickle
 import threading
 from networktables import NetworkTables
 
+sd = 0
+
 # start video stream capture
-vcap = cv2.VideoCapture('humphreyvision.mp4')
+vcap = cv2.VideoCapture('http://wpilibpi.local:1181/stream.mjpg')
 path = 'C:/Users/jonas/Documents/GitHub/Humphrey/gerry-vision/visionmodels/v3.pt'
 # import desired model
 model = torch.hub.load('', 'custom', path=path, source='local')
@@ -48,9 +50,6 @@ def network_table_opt(using_network_tables):
                 cond.wait()
     else:
         print('NetworkTables is not connected')
-
-
-sd = NetworkTables.getTable('SmartDashboard')
 
 def maximumNum(prov_list):
     global closest_cargo
@@ -88,6 +87,9 @@ size_xymid_bumper = []
 split_size = []
 split_xymid = []
 
+def putAction(action):
+    global sd
+    sd.putString('action', action)
 
 # image processing loop
 def processing():
@@ -107,6 +109,7 @@ def processing():
         global split_size
         global split_xymid
         global largest_item_int
+        global sd
         # reset object variables every frame
         largest_item_int = 0
         split_size = []
@@ -196,10 +199,13 @@ def processing():
                         # create three sections on the screen and print "left", "center", and "right" based on where the selected object is on the screen
                         if 0 < closestxy[0] < 106.666 and object_colorclass == selected_color:
                             print('left')
+                            putAction('left')
                         elif 106.666 < closestxy[0] < 213.333 and object_colorclass == selected_color:
                             print('center')
+                            putAction('center')
                         elif 213.333 < closestxy[0] < 320 and object_colorclass == selected_color:
                             print('right')
+                            putAction('right')
 
                     elif selected_color == 'red':
                         for detected_cargo in size_xymid_red:
@@ -220,16 +226,17 @@ def processing():
                         # create three sections on the screen and print "left", "center", and "right" based on where the selected object is on the screen
                         if 0 < closestxy[0] < 106.666 and object_colorclass == selected_color:
                             print('left')
-                            sd.putNumber('action', 0)
+                            putAction('left')
                         elif 106.666 < closestxy[0] < 213.333 and object_colorclass == selected_color:
                             print('center')
-                            sd.putNumber('action', 1)
+                            putAction('center')
                         elif 213.333 < closestxy[0] < 320 and object_colorclass == selected_color:
                             print('right')
-                            sd.putNumber('action', 2)
+                            putAction('right')
 
                 except(IndexError):
                     print('stop')
+                    putAction('stop')
         runs += 1
 
         if cv2.waitKey(22) & 0xFF == ord('q'):
@@ -284,6 +291,7 @@ def header():
 def startup():
     global selected_color
     global flag
+    global sd
     header()
     print("What alliance are you on?")
     print("1) Blue")
@@ -310,6 +318,8 @@ def startup():
         nt_select = input('>')
         if nt_select == '1':
             network_table_opt(True)
+            sd = NetworkTables.getTable('SmartDashboard')
+            putAction('stop')
         if nt_select == '2':
             network_table_opt(False)
         processing()
@@ -334,6 +344,8 @@ def startup():
         nt_select = input('>')
         if nt_select == '1':
             network_table_opt(True)
+            sd = NetworkTables.getTable('SmartDashboard')
+            putAction('stop')
         if nt_select == '2':
             network_table_opt(False)
         processing()
