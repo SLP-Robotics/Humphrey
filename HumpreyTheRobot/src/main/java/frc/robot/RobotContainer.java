@@ -9,9 +9,13 @@ public class RobotContainer {
     public Joystick center = new Joystick(1);
     public Joystick right = new Joystick(2);
     final JoystickButton speedBoost = new JoystickButton(center, 3);
+    final JoystickButton teleopCargoLock = new JoystickButton(left, 3);
+    final JoystickButton aimBotToggle = new JoystickButton(right, 3);
 
     public double speed, direction;
     public boolean boostEnabled;
+    public boolean autoCargoEnabled;
+    public boolean aimBotEnabled;
 
     public RobotContainer(){
         readButtons();
@@ -21,6 +25,8 @@ public class RobotContainer {
         speed = center.getY();
         direction = left.getX();
         boostEnabled = speedBoost.get();
+        autoCargoEnabled = teleopCargoLock.get();
+        aimBotEnabled = aimBotToggle.get();
     }
 }
 

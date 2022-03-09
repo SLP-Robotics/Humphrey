@@ -3,13 +3,6 @@ import cv2
 import os
 import numpy as np
 import base64
-from models.common import DetectMultiBackend
-from utils.datasets import IMG_FORMATS, VID_FORMATS, LoadImages, LoadStreams
-from utils.general import (LOGGER, check_file, check_img_size, check_imshow, check_requirements, colorstr,
-                           increment_path, non_max_suppression, print_args, scale_coords, strip_optimizer, xyxy2xywh)
-from utils.plots import Annotator, colors, save_one_box
-from utils.torch_utils import select_device, time_sync
-from PIL import Image, ImageColor
 import sys
 import time
 import random
@@ -87,7 +80,7 @@ size_xymid_bumper = []
 split_size = []
 split_xymid = []
 
-def putAction(action):
+def put_action(action):
     global sd
     sd.putString('action', action)
 
@@ -139,104 +132,105 @@ def processing():
 
         results_bgr = cv2.cvtColor(results.imgs[0], cv2.COLOR_RGB2BGR)
 
-        length = len(results.xyxy[0])
+        # split results into separate variables
+        # all the following code is likely going to be heavily modified
+        for xmin, ymin, xmax, ymax, conf, c in results.xyxy[0]:
+            # calculate center of every object
+            xy_center = (xmin.item() + xmax.item()) / 2, (ymin.item() + ymax.item()) / 2
+            # get the size of every object
+            obj_size = (((xmax.item() - xmin.item()) ** 2 + (ymax.item() - ymin.item()) ** 2) ** 0.5)
 
-        # get results
-        if results.xyxy[0].size()[0] == 0:
-            print('')
-        else:
-            # split results into separate variables
-            # all of the following code is likely going to be heavily modified
-            for xmin, ymin, xmax, ymax, conf, c in results.xyxy[0]:
-                # calculate center of every object
-                xy_center = (xmin.item() + xmax.item()) / 2, (ymin.item() + ymax.item()) / 2
-                # get the size of every object
-                obj_size = (((xmax.item() - xmin.item()) ** 2 + (ymax.item() - ymin.item()) ** 2) ** 0.5)
+            # visualize the center of the object with a green dot
+            center_vis = cv2.line(frame, (int(xy_center[0]), int(xy_center[1])),
+                                  (int(xy_center[0]), int(xy_center[1])),
+                                  (0, 255, 0), 15)
 
-                # visualize the center of the object with a green dot
-                center_vis = cv2.line(frame, (int(xy_center[0]), int(xy_center[1])),
-                                      (int(xy_center[0]), int(xy_center[1])),
-                                      (0, 255, 0), 15)
+            # sort objects by class into a more readable format
+            if c == 0:
+                size_xymid_blue.append([xy_center, obj_size])
+                object_colorclass = 'blue'
 
-                # sort objects by class into a more readable format
-                if c == 0:
-                    size_xymid_blue.append([xy_center, obj_size])
-                    object_colorclass = 'blue'
+            if c == 1:
+                size_xymid_bumper.append([xy_center, obj_size])
+                object_colorclass = 'bumper'
 
-                if c == 1:
-                    size_xymid_bumper.append([xy_center, obj_size])
-                    object_colorclass = 'bumper'
+            if c == 2:
+                size_xymid_red.append([xy_center, obj_size])
+                object_colorclass = 'red'
 
-                if c == 2:
-                    size_xymid_red.append([xy_center, obj_size])
-                    object_colorclass = 'red'
+            # currently unused code for tracking the objects to make sure the code follows the same one
+            # if runs > 1:
+            #    detections_previous = detections
+            #    closest = min(detections_previous[int(length_int)],
+            #                  key=lambda x: abs(x - detections[int(length_int)]))
+            #    print(closest)
+            # length_int += 1
+        if selected_algorithm == 'size':
+            try:
+                crash = results.pandas().xyxy[0]
+                if selected_color == 'blue':
+                    for detected_cargo in size_xymid_blue:
+                        split_size.append(detected_cargo[1])
+                        split_xymid.append(detected_cargo[0])
 
-                # currently unused code for tracking the objects to make sure the code follows the same one
-                # if runs > 1:
-                #    detections_previous = detections
-                #    closest = min(detections_previous[int(length_int)],
-                #                  key=lambda x: abs(x - detections[int(length_int)]))
-                #    print(closest)
-                # length_int += 1
-            if selected_algorithm == 'size':
-                try:
-                    if selected_color == 'blue':
-                        for detected_cargo in size_xymid_blue:
-                            split_size.append(detected_cargo[1])
-                            split_xymid.append(detected_cargo[0])
+                    maximumNum(split_size)
 
-                        maximumNum(split_size)
+                    closestxy = split_xymid[largest_item_int]
 
-                        closestxy = split_xymid[largest_item_int]
+                    closest_vis = cv2.line(frame, (int(closestxy[0]), int(closestxy[1])),
+                                           (int(closestxy[0]), int(closestxy[1])), (0, 0, 255), 15)
 
-                        closest_vis = cv2.line(frame, (int(closestxy[0]), int(closestxy[1])),
-                                               (int(closestxy[0]), int(closestxy[1])), (0, 0, 255), 15)
+                    # display combined images
+                    combined_images = np.concatenate((results_bgr, center_vis), axis=1)
+                    cv2.imshow('results + center_vis', combined_images)
 
-                        # display combined images
-                        combined_images = np.concatenate((results_bgr, center_vis), axis=1)
-                        cv2.imshow('results + center_vis', combined_images)
+                    # create three sections on the screen and print "left", "center", and "right" based on where the
+                    # selected object is on the screen
+                    if 0 < closestxy[0] < 106.666 and object_colorclass == selected_color:
+                        print('left')
+                        put_action('left')
+                    elif 106.666 < closestxy[0] < 213.333 and object_colorclass == selected_color:
+                        print('center')
+                        put_action('center')
+                    elif 213.333 < closestxy[0] < 320 and object_colorclass == selected_color:
+                        print('right')
+                        put_action('right')
+                    else:
+                        put_action('stop')
 
-                        # create three sections on the screen and print "left", "center", and "right" based on where the selected object is on the screen
-                        if 0 < closestxy[0] < 106.666 and object_colorclass == selected_color:
-                            print('left')
-                            putAction('left')
-                        elif 106.666 < closestxy[0] < 213.333 and object_colorclass == selected_color:
-                            print('center')
-                            putAction('center')
-                        elif 213.333 < closestxy[0] < 320 and object_colorclass == selected_color:
-                            print('right')
-                            putAction('right')
+                elif selected_color == 'red':
+                    for detected_cargo in size_xymid_red:
+                        split_size.append(detected_cargo[1])
+                        split_xymid.append(detected_cargo[0])
 
-                    elif selected_color == 'red':
-                        for detected_cargo in size_xymid_red:
-                            split_size.append(detected_cargo[1])
-                            split_xymid.append(detected_cargo[0])
+                    maximumNum(split_size)
 
-                        maximumNum(split_size)
+                    closestxy = split_xymid[largest_item_int]
 
-                        closestxy = split_xymid[largest_item_int]
+                    closest_vis = cv2.line(frame, (int(closestxy[0]), int(closestxy[1])),
+                                           (int(closestxy[0]), int(closestxy[1])), (255, 0, 0), 15)
 
-                        closest_vis = cv2.line(frame, (int(closestxy[0]), int(closestxy[1])),
-                                               (int(closestxy[0]), int(closestxy[1])), (255, 0, 0), 15)
+                    # display combined images
+                    combined_images = np.concatenate((results_bgr, center_vis), axis=1)
+                    cv2.imshow('results + center_vis', combined_images)
 
-                        # display combined images
-                        combined_images = np.concatenate((results_bgr, center_vis), axis=1)
-                        cv2.imshow('results + center_vis', combined_images)
+                    # create three sections on the screen and print "left", "center", and "right" based on where the
+                    # selected object is on the screen
+                    if 0 < closestxy[0] < 106.666 and object_colorclass == selected_color:
+                        print('left')
+                        put_action('left')
+                    elif 106.666 < closestxy[0] < 213.333 and object_colorclass == selected_color:
+                        print('center')
+                        put_action('center')
+                    elif 213.333 < closestxy[0] < 320 and object_colorclass == selected_color:
+                        print('right')
+                        put_action('right')
+                    else:
+                        put_action('stop')
 
-                        # create three sections on the screen and print "left", "center", and "right" based on where the selected object is on the screen
-                        if 0 < closestxy[0] < 106.666 and object_colorclass == selected_color:
-                            print('left')
-                            putAction('left')
-                        elif 106.666 < closestxy[0] < 213.333 and object_colorclass == selected_color:
-                            print('center')
-                            putAction('center')
-                        elif 213.333 < closestxy[0] < 320 and object_colorclass == selected_color:
-                            print('right')
-                            putAction('right')
-
-                except(IndexError):
-                    print('stop')
-                    putAction('stop')
+            except:
+                print('stop')
+                put_action('stop')
         runs += 1
 
         if cv2.waitKey(22) & 0xFF == ord('q'):
@@ -319,7 +313,7 @@ def startup():
         if nt_select == '1':
             network_table_opt(True)
             sd = NetworkTables.getTable('SmartDashboard')
-            putAction('stop')
+            put_action('stop')
         if nt_select == '2':
             network_table_opt(False)
         processing()
@@ -345,7 +339,7 @@ def startup():
         if nt_select == '1':
             network_table_opt(True)
             sd = NetworkTables.getTable('SmartDashboard')
-            putAction('stop')
+            put_action('stop')
         if nt_select == '2':
             network_table_opt(False)
         processing()

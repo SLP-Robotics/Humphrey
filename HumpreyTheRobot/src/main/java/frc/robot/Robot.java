@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.subsystems.AimBot;
 import frc.robot.subsystems.drivehumphrey;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTable;
@@ -81,6 +82,7 @@ public class Robot extends TimedRobot {
     else {
       drivehumphrey.drive(0, 0);
     }
+    //orient to goal and shoot preloaded cargo before autoCargo
     if (autoRuns >= autonomousReverseCycles) {
       autoCargo();
     }
@@ -100,6 +102,12 @@ public class Robot extends TimedRobot {
     }
     else{
       drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction);
+    if(m_robotContainer.autoCargoEnabled) {
+      autoCargo();
+    }
+    if(m_robotContainer.aimBotEnabled) {
+      //AimBot.orientToGoal(); do this later
+    }
     }
   }
 
