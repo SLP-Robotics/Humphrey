@@ -17,7 +17,7 @@ public class RobotContainer {
     public boolean boostEnabled;
     public boolean autoCargoEnabled;
     public boolean aimBotEnabled;
-    final JoystickButton shootInitiate = new JoystickButton(right, 3);
+    final JoystickButton shootInitiate = new JoystickButton(right, 1);
 
     public double inputShooterSpeed;//The inputShooterSpeed will eventually be deleted and its function replaced by a distance lookup table
     public boolean shootInitiated;
