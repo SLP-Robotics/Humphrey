@@ -112,7 +112,8 @@ public class Robot extends TimedRobot {
     }
     if(m_robotContainer.shootInitiated) {
       //TODO: change the shoot input to a look up table
-      HumphreyShooter.shoot(m_robotContainer.inputShooterSpeed);//This right now just sets the variable shooter wheel to the input from the third joystick
+      HumphreyShooter.shoot(m_robotContainer.inputShooterSpeed);
+      //This right now just sets the variable shooter wheel to the input from the third joystick
     }
     if(m_robotContainer.intakeInitiated){
       Intake.go();
