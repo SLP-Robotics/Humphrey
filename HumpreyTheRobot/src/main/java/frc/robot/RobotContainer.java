@@ -17,6 +17,8 @@ public class RobotContainer {
     public boolean boostEnabled;
     public boolean autoCargoEnabled;
     public boolean aimBotEnabled;
+    public boolean intakeInitiated;
+    final JoystickButton intakeInitiate = new JoystickButton(right, 2);
     final JoystickButton shootInitiate = new JoystickButton(right, 1);
 
     public double inputShooterSpeed;//The inputShooterSpeed will eventually be deleted and its function replaced by a distance lookup table
@@ -34,6 +36,7 @@ public class RobotContainer {
         aimBotEnabled = aimBotToggle.get();
         shootInitiated = shootInitiate.get();
         inputShooterSpeed = Math.abs(right.getY());//Absolute value to prevent the wheel from spinning backwards which could cause... idk what could happen, but probably not good
+        intakeInitiated = intakeInitiate.get();
     }
 }
 
