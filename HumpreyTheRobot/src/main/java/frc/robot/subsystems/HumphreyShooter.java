@@ -12,7 +12,7 @@ public class HumphreyShooter {
     static WPI_TalonFX constantWheel = new WPI_TalonFX(5);
     static WPI_TalonFX changingWheel = new WPI_TalonFX(6);
 
-    public static final double constantWheelSpeed = 1;//This we can preset until we find a value we like
+    public static final double constantWheelSpeed = 0.5;//This we can preset until we find a value we like
     //Based on the situation of the motors and their placement, we might need to invert this? So that the motors actually shoot the ball and dont just spin it in place
     public static DifferentialDrive drive = new DifferentialDrive(constantWheel, changingWheel);
 
