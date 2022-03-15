@@ -22,6 +22,8 @@ selected_algorithm = 'none'
 largest_item_int = 0
 closest_cargo = []
 
+
+
 cond = threading.Condition()
 notified = [False]
 
@@ -167,6 +169,7 @@ def processing():
             # length_int += 1
         if selected_algorithm == 'size':
             try:
+                # purposefully crash the code to get caught by the try except
                 crash = results.pandas().xyxy[0]
                 if selected_color == 'blue':
                     for detected_cargo in size_xymid_blue:
