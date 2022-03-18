@@ -31,6 +31,7 @@ public class Robot extends TimedRobot {
   public static final double autonomousReverseCycles = reverseTimeS / autonomousPeriodTimeS;
   NetworkTableInstance inst;
   NetworkTable table;
+  public static final double offsetDir = -0.3;
 
   public void autoCargo() {
     NetworkTableEntry controlActionTable = table.getEntry("action");
@@ -97,12 +98,22 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    double drivingForwards = -m_robotContainer.speed/Math.abs(m_robotContainer.speed);
     m_robotContainer.readButtons();
     if(m_robotContainer.boostEnabled) {
-      drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction);
+      if(Math.abs(m_robotContainer.direction)<0.1){
+        drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction-(offsetDir*drivingForwards));
+      }else{
+        drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction);//functionally the same as driving with 0 turn
+      }
     }
     else{
-      drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction);
+      if(Math.abs(m_robotContainer.direction)<0.1){
+        drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction-(offsetDir*drivingForwards));
+      }else{
+        drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction);
+      }
+
     if(m_robotContainer.autoCargoEnabled) {
       autoCargo();
     }
