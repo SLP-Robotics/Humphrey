@@ -33,6 +33,12 @@ public class Robot extends TimedRobot {
   NetworkTable table;
   public static final double offsetDir = -0.3;
 
+  public int shootingCounter = 0;
+  public boolean currentlyShooting = false;
+  public int shootingStartPoint = 14400000;//The equivalent of 4 hours
+  public static final double loadTime = 300;//Each of these are in the number of loops executed
+  public static final double revTime = 75;//Each of which takes up 20 ms
+
   public void autoCargo() {
     NetworkTableEntry controlActionTable = table.getEntry("action");
     String action = controlActionTable.getString("none");
@@ -92,12 +98,16 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    shootingCounter = 0;
     System.out.println("starting teleop");
 
   }
 
   @Override
   public void teleopPeriodic() {
+
+    shootingCounter++;
+
     double drivingForwards = -m_robotContainer.speed/Math.abs(m_robotContainer.speed);
     m_robotContainer.readButtons();
     if(m_robotContainer.boostEnabled) {
@@ -121,14 +131,32 @@ public class Robot extends TimedRobot {
       //AimBot.orientToGoal(); do this later
     }
     }
+    
     if(m_robotContainer.shootInitiated) {
-      //TODO: change the shoot input to a look up table
-      HumphreyShooter.shoot(m_robotContainer.inputShooterSpeed);
-      //This right now just sets the variable shooter wheel to the input from the third joystick
+      if (!currentlyShooting){
+        currentlyShooting = true;
+        shootingStartPoint = shootingCounter;
+      }
     }
+      if (currentlyShooting){
+        if ((shootingStartPoint<shootingCounter) && (shootingCounter<=(shootingStartPoint+revTime))){
+            HumphreyShooter.shoot(m_robotContainer.inputShooterSpeed);
+            System.out.println("Revving");
+        }else if (((shootingStartPoint+revTime)<shootingCounter) && (shootingCounter<=(shootingStartPoint+revTime+loadTime))){
+          HumphreyShooter.shoot(m_robotContainer.inputShooterSpeed);
+          HumphreyShooter.shooterIntake();
+          System.out.println("Intaking and shooting");
+        }else if (shootingCounter>(shootingStartPoint+revTime+loadTime)){
+         currentlyShooting = false;
+         shootingStartPoint = 14400000;
+        }
+       //TODO: change the shoot input to a look up table
+       //HumphreyShooter.shoot(m_robotContainer.inputShooterSpeed);
+       //This right now just sets the variable shooter wheel to the input from the third joystick
+      }
     if(m_robotContainer.intakeInitiated){
       Intake.go();
-    }
+  }
   }
 
   @Override

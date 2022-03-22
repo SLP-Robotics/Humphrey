@@ -32,7 +32,8 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/LiveWindow/Ungrouped/DifferentialDrive[2]": "DifferentialDrive",
-      "/LiveWindow/Ungrouped/DifferentialDrive[3]": "DifferentialDrive"
+      "/LiveWindow/Ungrouped/DifferentialDrive[3]": "DifferentialDrive",
+      "/LiveWindow/Ungrouped/Talon FX [7]": "Motor Controller"
     }
   }
 }
