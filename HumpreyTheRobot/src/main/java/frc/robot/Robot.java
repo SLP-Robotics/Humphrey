@@ -149,6 +149,7 @@ public class Robot extends TimedRobot {
         }else if (shootingCounter>(shootingStartPoint+revTime+loadTime)){
          currentlyShooting = false;
          shootingStartPoint = 14400000;
+          HumphreyShooter.stopShooterIntake();
         }
        //TODO: change the shoot input to a look up table
        //HumphreyShooter.shoot(m_robotContainer.inputShooterSpeed);
