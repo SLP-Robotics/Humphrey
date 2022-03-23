@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
   public static final double autonomousReverseCycles = reverseTimeS / autonomousPeriodTimeS;
   NetworkTableInstance inst;
   NetworkTable table;
-  public static final double offsetDir = -0.3;
+  public static final double offsetDir = -0.3;//This is the offset amount for the robot's driving: must be changed when new weight is added
 
   public int shootingCounter = 0;
   public boolean currentlyShooting = false;
@@ -110,18 +110,18 @@ public class Robot extends TimedRobot {
 
     double drivingForwards = -m_robotContainer.speed/Math.abs(m_robotContainer.speed);
     m_robotContainer.readButtons();
-    if(m_robotContainer.boostEnabled) {
+    if(m_robotContainer.boostEnabled) {//Turbo mode
       if(Math.abs(m_robotContainer.direction)<0.1){
-        drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction-(offsetDir*drivingForwards));
+        drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction-(offsetDir*drivingForwards));//Drive with the offset
       }else{
         drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction);//functionally the same as driving with 0 turn
       }
     }
     else{
-      if(Math.abs(m_robotContainer.direction)<0.1){
-        drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction-(offsetDir*drivingForwards));
+      if(Math.abs(m_robotContainer.direction)<0.1){//Driving straight
+        drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction-(offsetDir*drivingForwards));//Drive with the offset
       }else{
-        drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction);
+        drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction);//functionally the same as driving with 0 turn
       }
 
     if(m_robotContainer.autoCargoEnabled) {
@@ -139,20 +139,19 @@ public class Robot extends TimedRobot {
       }
     }
       if (currentlyShooting){
-        if ((shootingStartPoint<shootingCounter) && (shootingCounter<=(shootingStartPoint+revTime))){
+        if ((shootingStartPoint<shootingCounter) && (shootingCounter<=(shootingStartPoint+revTime))){//If the current point in time is between when shooting started and the time it takes to rev
             HumphreyShooter.shoot(m_robotContainer.inputShooterSpeed);
             System.out.println("Revving");
-        }else if (((shootingStartPoint+revTime)<shootingCounter) && (shootingCounter<=(shootingStartPoint+revTime+loadTime))){
+        }else if (((shootingStartPoint+revTime)<shootingCounter) && (shootingCounter<=(shootingStartPoint+revTime+loadTime))){//If the current point in time is between the time it takes to rev and the time it takes to load
           HumphreyShooter.shoot(m_robotContainer.inputShooterSpeed);
           HumphreyShooter.shooterIntake();
           System.out.println("Intaking and shooting");
-        }else if (shootingCounter>(shootingStartPoint+revTime+loadTime)){
+        }else if (shootingCounter>(shootingStartPoint+revTime+loadTime)){//If it is past the time to load
          currentlyShooting = false;
          shootingStartPoint = 14400000;
-          HumphreyShooter.stopShooterIntake();
+          HumphreyShooter.stopShooterIntake();//Because the lone intake wheel in the shooter system is set by way of the "motor.set" method
         }
        //TODO: change the shoot input to a look up table
-       //HumphreyShooter.shoot(m_robotContainer.inputShooterSpeed);
        //This right now just sets the variable shooter wheel to the input from the third joystick
       }
     if(m_robotContainer.intakeInitiated){
