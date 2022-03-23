@@ -39,6 +39,8 @@ public class Robot extends TimedRobot {
   public static final double loadTime = 300;//Each of these are in the number of loops executed
   public static final double revTime = 75;//Each of which takes up 20 ms
 
+  public double joystickSetShooterSpeed = 0;
+
   public void autoCargo() {
     NetworkTableEntry controlActionTable = table.getEntry("action");
     String action = controlActionTable.getString("none");
@@ -136,16 +138,17 @@ public class Robot extends TimedRobot {
       if (!currentlyShooting){
         currentlyShooting = true;
         shootingStartPoint = shootingCounter;
+        joystickSetShooterSpeed = (m_robotContainer.inputShooterSpeed); //TODO: replace this system with a lookup table
       }
     }
       if (currentlyShooting){
         if ((shootingStartPoint<shootingCounter) && (shootingCounter<=(shootingStartPoint+revTime))){//If the current point in time is between when shooting started and the time it takes to rev
-            HumphreyShooter.shoot(m_robotContainer.inputShooterSpeed);
-            System.out.println("Revving");
+            HumphreyShooter.shoot(joystickSetShooterSpeed);
+            System.out.println("Revving @ " + joystickSetShooterSpeed);
         }else if (((shootingStartPoint+revTime)<shootingCounter) && (shootingCounter<=(shootingStartPoint+revTime+loadTime))){//If the current point in time is between the time it takes to rev and the time it takes to load
-          HumphreyShooter.shoot(m_robotContainer.inputShooterSpeed);
+          HumphreyShooter.shoot(joystickSetShooterSpeed);
           HumphreyShooter.shooterIntake();
-          System.out.println("Intaking and shooting");
+          System.out.println("Intaking and shooting @ " + joystickSetShooterSpeed);
         }else if (shootingCounter>(shootingStartPoint+revTime+loadTime)){//If it is past the time to load
          currentlyShooting = false;
          shootingStartPoint = 14400000;
