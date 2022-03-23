@@ -26,4 +26,8 @@ public class HumphreyShooter {
         intakeWheel.set(1);
         //System.out.println("shooter intake");
     }
+    
+    public static void stopShooterIntake(){
+        intakeWheel.set(0);
+    }
 }
