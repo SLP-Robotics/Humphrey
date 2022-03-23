@@ -149,6 +149,7 @@ public class Robot extends TimedRobot {
         }else if (shootingCounter>(shootingStartPoint+revTime+loadTime)){//If it is past the time to load
          currentlyShooting = false;
          shootingStartPoint = 14400000;
+          HumphreyShooter.stopShooting();//Stop the system from spinning the shooter motors
           HumphreyShooter.stopShooterIntake();//Because the lone intake wheel in the shooter system is set by way of the "motor.set" method
         }
        //TODO: change the shoot input to a look up table
