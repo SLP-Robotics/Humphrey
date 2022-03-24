@@ -15,7 +15,7 @@ public class AimBot{
     }
     //motor (top, bottom)
 
-    private static final float TURNING_ERROR_MARGIN = 0.0000001f;
+    private static final float TURNING_ERROR_MARGIN = 5f;
     private static final float SPACING = 0.25f;
 
     public void shooterMotorSpeed(float distance){
@@ -24,17 +24,17 @@ public class AimBot{
 
     }
 
-    public void orientToGoal(float angle, drivehumphrey drive){
-
+    public static void orientToGoal(double angle){
+        
         //turn the robot (control the robot)
 
-        if (angle < -TURNING_ERROR_MARGIN ){
+        if (angle < -TURNING_ERROR_MARGIN){
             //turn to the left
-            drive.drive( 0 , -0.5);
+            drivehumphrey.drive( 0 , -0.62);
         }
         else if (angle > TURNING_ERROR_MARGIN){
             //turn to the right
-            drive.drive( 0 , 0.5);
+            drivehumphrey.drive( 0 , 0.62);
         }
 
 

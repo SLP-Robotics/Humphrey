@@ -7,10 +7,11 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.subsystems.AimBot;
 import frc.robot.subsystems.HumphreyShooter;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.drivehumphrey;
-import edu.wpi.first.cameraserver.CameraServer;
+import frc.robot.subsystems.limelight;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -130,8 +131,9 @@ public class Robot extends TimedRobot {
       autoCargo();
     }
     if(m_robotContainer.aimBotEnabled) {
-      //AimBot.orientToGoal(); do this later
-    }
+      limelight.getGoalPos();
+      AimBot.orientToGoal(limelight.x);
+      }
     }
     
     if(m_robotContainer.shootInitiated) {
