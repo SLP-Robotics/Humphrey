@@ -16,14 +16,16 @@ public class XboxControllerContainer {
     public boolean aimBotEnabled;
     public boolean intakeInitiated;
 
-    public double inputShooterSpeed;//The inputShooterSpeed will eventually be deleted and its function replaced by a distance lookup table
+    public double inputShooterSpeed;
+    // The inputShooterSpeed will eventually be deleted and its function replaced by
+    // a distance lookup table
     public boolean shootInitiated;
 
-    public XboxControllerContainer(){
+    public XboxControllerContainer() {
         readButtons();
     }
 
-    public void readButtons(){
+    public void readButtons() {
         speed = xbox.getLeftY();
         System.out.println(speed);
         direction = xbox.getLeftX();
@@ -31,13 +33,10 @@ public class XboxControllerContainer {
         boostValue = xbox.getLeftStickButton();
         autoCargoEnabled = xbox.getLeftBumper();
         aimBotEnabled = xbox.getRightBumper();
-        shootInitiated = (xbox.getRightTriggerAxis()>0.1);
-        inputShooterSpeed = Math.abs(xbox.getRightX());//Absolute value to prevent the wheel from spinning backwards which could cause... idk what could happen, but probably not good
-        intakeInitiated = (xbox.getLeftTriggerAxis()>0.1);
+        shootInitiated = (xbox.getRightTriggerAxis() > 0.1);
+        inputShooterSpeed = Math.abs(xbox.getRightX());
+        // Absolute value to prevent the wheel from spinning backwards which could
+        // cause... idk what could happen, but probably not good
+        intakeInitiated = (xbox.getLeftTriggerAxis() > 0.1);
     }
 }
-
-
-
-
-
