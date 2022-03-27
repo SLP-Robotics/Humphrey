@@ -10,6 +10,7 @@ from playsound import playsound
 import pickle
 import threading
 from networktables import NetworkTables
+import tkinter as tk
 
 sd = 0
 
@@ -284,6 +285,15 @@ def header():
         print("---------------")
         playsound('bruh.mp3')
 
+def assign_values_color(color):
+    global selected_color
+    global flag
+    global sd
+    selected_color = color
+    algorithm('size')
+    network_table_opt(True)
+    sd = NetworkTables.getTable('SmartDashboard')
+    put_action('stop')
 
 def startup():
     global selected_color
@@ -360,6 +370,26 @@ def startup():
                 playsound('bruh.mp3')
             quit()
 
+# use tkinter to make a 640x480 window with a button in the middle labeled "Blue Team"
+def simple_gui():
+    global flag
+    global sd
+    root = tk.Tk()
+    root.title("Gerry Vision")
+    root.geometry("640x480")
+    if flag == 2:
+        playsound('bruh.mp3')
+    label = tk.Label(root, text="Gerry Vision", font=("Helvetica", 32))
+    label.pack()
+    button = tk.Button(root, text="Blue Team", command=lambda: [root.destroy(), assign_values_color('blue'), startup()])
+    button.pack()
+    button2 = tk.Button(root, text="Red Team", command=lambda: [root.destroy(), assign_values_color('red'), ])
+    button2.pack()
+    button3 = tk.Button(root, text="Quit", command=lambda: [root.destroy(), quit()])
+    button3.pack()
+    label2 = tk.Label(root, text="Made by Gerry", font=("Helvetica", 8))
+    label2.pack(side='bottom')
+    root.mainloop()
 
 charstr = ''
 charstr2 = ''
@@ -521,6 +551,8 @@ def egg():
             print("Initializing...")
             time.sleep(3.2)
             os.system('python data/scripts/t.py')
+        elif arguments == '--gui':
+            simple_gui()
         else:
             startup()
         cleanup()
