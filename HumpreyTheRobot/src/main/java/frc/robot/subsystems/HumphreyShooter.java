@@ -25,6 +25,7 @@ public class HumphreyShooter {
 
     public static void stopShooting() {
         shooters.tankDrive(0, 0);
+        intakeWheel.set(0);
     }
 
     public static void shooterIntake() {
@@ -32,7 +33,5 @@ public class HumphreyShooter {
         // System.out.println("shooter intake");
     }
 
-    public static void stopShooterIntake() {
-        intakeWheel.set(0);
-    }
+
 }

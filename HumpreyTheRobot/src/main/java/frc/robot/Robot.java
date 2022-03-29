@@ -167,7 +167,6 @@ public class Robot extends TimedRobot {
         currentlyShooting = false;
         shootingStartPoint = 14400000;
         HumphreyShooter.stopShooting();// Stop the system from spinning the shooter motors
-        HumphreyShooter.stopShooterIntake();
         // Because the lone intake wheel in the shooter system is set by way of the
         // "motor.set" method
       }
