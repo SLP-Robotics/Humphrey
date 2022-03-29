@@ -1,0 +1,8 @@
+Set speed: Left joystick, forward-back
+Change direction: Left joystick, left-right
+Speed boost: Left joystick toggle
+Face nearest cargo: LB
+Aim to goal: RB
+Shoot: Right trigger
+Set shoot speed: Right joystick: forward-back
+Intake: Left trigger
