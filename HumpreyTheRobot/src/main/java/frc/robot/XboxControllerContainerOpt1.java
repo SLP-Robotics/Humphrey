@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.lang.Math;
 
-public class XboxControllerContainer {
+public class XboxControllerContainerOpt1 {
 
     public XboxController xbox = new XboxController(0);
 
@@ -21,7 +21,7 @@ public class XboxControllerContainer {
     // a distance lookup table
     public boolean shootInitiated;
 
-    public XboxControllerContainer() {
+    public XboxControllerContainerOpt1() {
         readButtons();
     }
 
