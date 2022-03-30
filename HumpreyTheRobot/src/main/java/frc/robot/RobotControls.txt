@@ -6,3 +6,8 @@ Aim to goal: RB
 Shoot: Right trigger
 Set shoot speed: Right joystick: forward-back
 Intake: Left trigger
+
+Right turn: Right trigger
+Left turn: Left trigger
+Speed boost: B button
+Focus on Cargo: Y button

@@ -176,7 +176,9 @@ public class Robot extends TimedRobot {
       // third joystick
     }
     if (m_robotContainer.intakeInitiated) {
-      Intake.go();
+      Intake.intakeBall(true);
+    } else {
+      Intake.intakeBall(false);
     }
   }
 
