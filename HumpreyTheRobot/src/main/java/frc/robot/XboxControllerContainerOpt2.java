@@ -37,7 +37,7 @@ public class XboxControllerContainerOpt2 {
         inputShooterSpeed = Math.abs(xbox.getRightTriggerAxis());
         // Absolute value to prevent the wheel from spinning backwards which could
         // cause... idk what could happen, but probably not good
-        intakeInitiated = (xbox.getLeftTriggerAxis() > 0.1);
+        intakeInitiated = (xbox.getPOV() == 180);
 
         // Debora was here
     }
