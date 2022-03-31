@@ -8,8 +8,8 @@ Set shoot speed: Right joystick: forward-back
 Intake: Left trigger
 
 
-Right turn: Right trigger
-Left turn: Left trigger
+Set speed: Left joystick, forward-back
+Change direction: Left joystick, left-right
 Speed boost: B button
 Focus on cargo: Y button
 Aim to goal: A button

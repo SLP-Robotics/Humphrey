@@ -6,12 +6,12 @@ import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.lang.Math;
 
-public class XboxControllerContainerOpt2 {
+public class XboxControllerContainerOpt2 implements ControllerSystem {
 
     public XboxController xbox = new XboxController(0);
 
     public double speed, direction;
-    public boolean boostValue;
+    public boolean boostEnabled;
     public boolean autoCargoEnabled;
     public boolean aimBotEnabled;
     public boolean intakeInitiated;
@@ -27,10 +27,10 @@ public class XboxControllerContainerOpt2 {
 
     public void readButtons() {
         speed = xbox.getLeftY();
-        System.out.println(speed);
+        // System.out.println(speed);
         direction = xbox.getLeftX();
-        System.out.println(direction);
-        boostValue = xbox.getBButtonPressed();
+        // System.out.println(direction);
+        boostEnabled = xbox.getBButtonPressed();
         autoCargoEnabled = xbox.getYButtonPressed();
         aimBotEnabled = xbox.getAButtonPressed();
         shootInitiated = xbox.getXButtonPressed();
@@ -41,4 +41,36 @@ public class XboxControllerContainerOpt2 {
 
         // Debora was here
     }
+
+    public double getSpeed() {
+        return xbox.getLeftY();
+    };
+
+    public double getDirection() {
+        return xbox.getLeftX();
+    };
+
+    public boolean getBoostEnabled() {
+        return xbox.getBButtonPressed();
+    };
+
+    public boolean getAutoCargoEnabled() {
+        return xbox.getYButtonPressed();
+    };
+
+    public boolean getAimBotEnabled() {
+        return xbox.getAButtonPressed();
+    };
+
+    public boolean getShootInitiated() {
+        return xbox.getXButtonPressed();
+    };
+
+    public double getInputShooterSpeed() {
+        return Math.abs(xbox.getRightTriggerAxis());
+    };
+
+    public boolean getIntakeInitiated() {
+        return (xbox.getPOV() == 180);
+    };
 }
