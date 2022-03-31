@@ -29,15 +29,15 @@ public class XboxControllerContainerOpt3 implements ControllerSystem {
         //My very hopeful implementation of a tankDrive system using arcade drive
         //Why?
         //Because why not
-        speed = xbox.getLeftY();
+        speed = (xbox.getLeftY()+xbox.getRightY())/2;
         // System.out.println(speed);
-        direction = (xbox.getLeftY()-xbox.getRightY())/2;
+        direction = (Math.abs(xbox.getRightY)/-2)+(xbox.getLeftY()/2);
         // System.out.println(direction);
         boostEnabled = xbox.getBButtonPressed();
         autoCargoEnabled = xbox.getYButtonPressed();
         aimBotEnabled = xbox.getAButtonPressed();
         shootInitiated = xbox.getXButtonPressed();
-        inputShooterSpeed = Math.abs(xbox.getRightTriggerAxis());
+        inputShooterSpeed = Math.abs(xbox.getLeftTriggerAxis());
         // Absolute value to prevent the wheel from spinning backwards which could
         // cause... idk what could happen, but probably not good
         intakeInitiated = (xbox.getPOV() == 180);
@@ -46,11 +46,11 @@ public class XboxControllerContainerOpt3 implements ControllerSystem {
     }
 
     public double getSpeed() {
-        return xbox.getLeftY();
+        return (xbox.getLeftY()+xbox.getRightY())/2;
     };
 
     public double getDirection() {
-        return xbox.getLeftX();
+        return (Math.abs(xbox.getRightY)/-2)+(xbox.getLeftY()/2);
     };
 
     public boolean getBoostEnabled() {
