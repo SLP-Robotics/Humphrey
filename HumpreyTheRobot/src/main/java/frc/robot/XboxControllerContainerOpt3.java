@@ -21,17 +21,17 @@ public class XboxControllerContainerOpt3 implements ControllerSystem {
     // a distance lookup table
     public boolean shootInitiated;
 
-    public XboxControllerContainerOpt2() {
+    public XboxControllerContainerOpt3() {
         readButtons();
     }
 
     public void readButtons() {
-        //My very hopeful implementation of a tankDrive system using arcade drive
-        //Why?
-        //Because why not
-        speed = (xbox.getLeftY()+xbox.getRightY())/2;
+        // My very hopeful implementation of a tankDrive system using arcade drive
+        // Why?
+        // Because why not
+        speed = (xbox.getLeftY() + xbox.getRightY()) / 2;
         // System.out.println(speed);
-        direction = (Math.abs(xbox.getRightY)/-2)+(xbox.getLeftY()/2);
+        direction = (Math.abs(xbox.getRightY()) / -2) + (xbox.getLeftY() / 2);
         // System.out.println(direction);
         boostEnabled = xbox.getBButtonPressed();
         autoCargoEnabled = xbox.getYButtonPressed();
@@ -46,11 +46,13 @@ public class XboxControllerContainerOpt3 implements ControllerSystem {
     }
 
     public double getSpeed() {
-        return (xbox.getLeftY()+xbox.getRightY())/2;
+        // System.out.println((xbox.getLeftY() + xbox.getRightY()) / -2);
+        return (xbox.getLeftY() + xbox.getRightY()) / -2;
     };
 
     public double getDirection() {
-        return (Math.abs(xbox.getRightY)/-2)+(xbox.getLeftY()/2);
+        System.out.println((Math.abs(xbox.getRightY()) / -2) + (xbox.getLeftY() / 2));
+        return (Math.abs(xbox.getRightY()) / -2) + (xbox.getLeftY() / 2);
     };
 
     public boolean getBoostEnabled() {

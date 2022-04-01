@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
   public int shootingStartPoint = 14400000;// The equivalent of 4 hours
   public static final double loadTime = 300;// Each of these are in the number of loops executed
   public static final double revTime = 75;// Each of which takes up 20 ms
-
+  public static HumphreyShooter shooter = new HumphreyShooter();
   public double joystickSetShooterSpeed = 0;
 
   public void autoCargo() {
@@ -77,6 +77,7 @@ public class Robot extends TimedRobot {
     drivehumphrey.leftSide.setInverted(true);
     inst = NetworkTableInstance.getDefault();
     table = inst.getTable("SmartDashboard");
+
   }
 
   @Override

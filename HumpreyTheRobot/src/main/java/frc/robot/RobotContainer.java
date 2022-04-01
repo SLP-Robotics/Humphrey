@@ -8,7 +8,7 @@ import java.lang.Math;
 
 public class RobotContainer {
 
-    public ControllerSystem controller = new XboxControllerContainerOpt1();
+    public ControllerSystem controller = new JoystickContainer();
 
     public double speed, direction;
     public boolean boostEnabled;
