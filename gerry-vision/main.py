@@ -11,11 +11,13 @@ import pickle
 import threading
 from networktables import NetworkTables
 import tkinter as tk
+import ctypes as ct
+from tkinter import ttk
 
 sd = 0
 
 # start video stream capture
-vcap = cv2.VideoCapture('http://wpilibpi.local:1181/stream.mjpg')
+vcap = cv2.VideoCapture('0')
 path = 'C:/Users/jonas/Documents/GitHub/Humphrey/gerry-vision/visionmodels/v3.pt'
 # import desired model
 model = torch.hub.load('', 'custom', path=path, source='local')
@@ -28,6 +30,20 @@ closest_cargo = []
 cond = threading.Condition()
 notified = [False]
 
+def dark_title_bar(window):
+    """
+    MORE INFO:
+    https://docs.microsoft.com/en-us/windows/win32/api/dwmapi/ne-dwmapi-dwmwindowattribute
+    """
+    window.update()
+    DWMWA_USE_IMMERSIVE_DARK_MODE = 20
+    set_window_attribute = ct.windll.dwmapi.DwmSetWindowAttribute
+    get_parent = ct.windll.user32.GetParent
+    hwnd = get_parent(window.winfo_id())
+    rendering_policy = DWMWA_USE_IMMERSIVE_DARK_MODE
+    value = 2
+    value = ct.c_int(value)
+    set_window_attribute(hwnd, rendering_policy, ct.byref(value), ct.sizeof(value))
 
 def network_table_opt(using_network_tables):
     if using_network_tables:
@@ -370,25 +386,26 @@ def startup():
                 playsound('bruh.mp3')
             quit()
 
-# use tkinter to make a 640x480 window with a button in the middle labeled "Blue Team"
+
 def simple_gui():
     global flag
     global sd
     root = tk.Tk()
+    root.tk.call("source", "sun-valley.tcl")
+    root.tk.call("set_theme", "dark")
     root.title("Gerry Vision")
-    root.geometry("640x480")
-    if flag == 2:
-        playsound('bruh.mp3')
-    label = tk.Label(root, text="Gerry Vision", font=("Helvetica", 32))
-    label.pack()
-    button = tk.Button(root, text="Blue Team", command=lambda: [root.destroy(), assign_values_color('blue'), startup()])
-    button.pack()
-    button2 = tk.Button(root, text="Red Team", command=lambda: [root.destroy(), assign_values_color('red'), ])
-    button2.pack()
-    button3 = tk.Button(root, text="Quit", command=lambda: [root.destroy(), quit()])
-    button3.pack()
-    label2 = tk.Label(root, text="Made by Gerry", font=("Helvetica", 8))
-    label2.pack(side='bottom')
+    root.geometry("566x320")
+    dark_title_bar(root)
+    label = ttk.Label(root, text="Gerry Vision", font=("Helvetica", 32))
+    label.grid(row=0, column=1)
+    button = ttk.Button(root, text="Blue Team", command=lambda: [root.destroy(), button.destroy(), assign_values_color('blue'), startup()])
+    button.grid(row=1, column=0, ipady=50, ipadx=40)
+    button2 = ttk.Button(root, text="Red Team", command=lambda: [root.destroy(), button2.destroy(), assign_values_color('red'), startup()])
+    button2.grid(row=1, column=2, ipady=50, ipadx=40)
+    button3 = ttk.Button(root, text="Quit", command=lambda: [root.destroy(), button3.destroy(), quit()])
+    button3.grid(row=1, column=1, ipady=50, ipadx=70)
+    label2 = ttk.Label(root, text="Made by Gerry", font=("Helvetica", 8))
+    label2.grid(row=5, column=1)
     root.mainloop()
 
 charstr = ''
