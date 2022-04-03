@@ -4,7 +4,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import java.util.HashMap;
+import java.util.TreeMap;
 
 public class HumphreyShooter {
     static WPI_TalonFX constantWheel = new WPI_TalonFX(6);
@@ -15,7 +15,7 @@ public class HumphreyShooter {
     // invert this? So that the motors actually shoot the ball and dont just spin it
     // in place
     public static DifferentialDrive shooters = new DifferentialDrive(constantWheel, changingWheel);
-    public static HashMap<Double, Double> yValuesToSpeeds = new HashMap<>();
+    public static TreeMap<Double, Double> yValuesToSpeeds = new TreeMap<>();
 
     public HumphreyShooter() {
         // input all needed values
