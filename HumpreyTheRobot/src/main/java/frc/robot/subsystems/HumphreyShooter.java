@@ -20,7 +20,27 @@ public class HumphreyShooter {
     public static HashMap<Double, Double> yValuesToSpeeds = new HashMap<>();
 
     public HumphreyShooter() {
+        // input all needed values
         yValuesToSpeeds.put(-20.0, 3.0);
+    }
+
+    public double getSpeed(double yValue) {
+        double smallerY;
+        double largerY;
+        Double[] keys = (Double[]) yValuesToSpeeds.keySet().toArray();
+        largerY = keys[keys.length - 1];
+        smallerY = keys[keys.length - 2];
+        for (int i = 0; i < keys.length; i++) {
+            if (keys[i] > yValue) {
+                largerY = keys[i];
+                smallerY = keys[i - 1];
+                break;
+            }
+        }
+        double percentage = (yValue - smallerY) / (largerY - smallerY);
+        double speed = Math.abs(yValuesToSpeeds.get(smallerY)
+                + percentage * (yValuesToSpeeds.get(largerY) - yValuesToSpeeds.get(smallerY)));
+        return speed;
     }
 
     public static void shoot(double wheelSpeed) {
