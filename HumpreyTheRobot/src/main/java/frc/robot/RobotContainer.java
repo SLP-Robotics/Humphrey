@@ -1,11 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import java.lang.Math;
-
 public class RobotContainer {
 
     public ControllerSystem controller = new JoystickContainer();
@@ -26,7 +20,7 @@ public class RobotContainer {
     }
 
     public double deadzone(double input) {
-        if (input < 0.1) {
+        if (Math.abs(input) < 0.1) {
             return 0;
         } else {
             return input;

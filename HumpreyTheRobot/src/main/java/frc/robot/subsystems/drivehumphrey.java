@@ -1,12 +1,11 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 
-public class drivehumphrey {
+public class DriveHumphrey {
     static WPI_VictorSPX rightMotor1 = new WPI_VictorSPX(1);
     static WPI_VictorSPX rightMotor2 = new WPI_VictorSPX(2);
     static WPI_VictorSPX leftMotor1 = new WPI_VictorSPX(3);
@@ -17,7 +16,7 @@ public class drivehumphrey {
 
     public static DifferentialDrive drive = new DifferentialDrive(leftSide, rightSide);
 
-    public static void drive(double speed, double rotation) {
+    public void drive(double speed, double rotation) {
         drive.arcadeDrive(speed, rotation * -0.6);
 
     }
