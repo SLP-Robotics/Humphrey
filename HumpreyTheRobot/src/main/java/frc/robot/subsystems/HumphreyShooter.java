@@ -17,7 +17,7 @@ public class HumphreyShooter {
     public static DifferentialDrive shooters = new DifferentialDrive(constantWheel, changingWheel);
     public static TreeMap<Double, Double> yValuesToSpeeds = new TreeMap<>();
 
-    public HumphreyShooter() {
+    static {
         // input all needed values
         yValuesToSpeeds.put(-20.0, 3.0);
     }
