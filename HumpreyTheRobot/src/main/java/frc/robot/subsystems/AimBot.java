@@ -5,6 +5,7 @@ public class AimBot {
     // look up table here
     private static final float[] LOOKUP_TABLE = {};
 
+    @SuppressWarnings("unused")
     private float getSpeedForDistance(float distance) {
         int index = (int) Math.floor(distance / SPACING);
         if (index >= LOOKUP_TABLE.length) {
@@ -25,16 +26,15 @@ public class AimBot {
 
     }
 
-    public static void orientToGoal(double angle) {
-
+    public static void orientToGoal(double angle, DriveHumphrey drive) {
         // turn the robot (control the robot)
 
         if (angle < -TURNING_ERROR_MARGIN) {
             // turn to the left
-            drivehumphrey.drive(0, -0.62);
+            drive.drive(0, -0.62);
         } else if (angle > TURNING_ERROR_MARGIN) {
             // turn to the right
-            drivehumphrey.drive(0, 0.62);
+            drive.drive(0, 0.62);
         }
 
     }

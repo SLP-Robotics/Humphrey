@@ -4,13 +4,11 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.subsystems.AimBot;
+import frc.robot.subsystems.DriveHumphrey;
 import frc.robot.subsystems.HumphreyShooter;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.drivehumphrey;
 import frc.robot.subsystems.limelight;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -27,7 +25,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  */
 public class Robot extends TimedRobot {
 
-  public static drivehumphrey drivehumphrey = new drivehumphrey();
+  public static DriveHumphrey drivehumphrey = new DriveHumphrey();
   public RobotContainer m_robotContainer;
   public int autoRuns = 0;
   public static final double reverseTimeS = 0.1;
@@ -47,7 +45,7 @@ public class Robot extends TimedRobot {
   public static HumphreyShooter shooter = new HumphreyShooter();
   public double joystickSetShooterSpeed = 0;
 
-  public void autoCargo() {
+  private void autoCargo() {
     NetworkTableEntry controlActionTable = table.getEntry("action");
     String action = controlActionTable.getString("none");
     if (action.equals("stop")) {
@@ -74,7 +72,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    drivehumphrey.leftSide.setInverted(true);
+    DriveHumphrey.leftSide.setInverted(true);
     inst = NetworkTableInstance.getDefault();
     table = inst.getTable("SmartDashboard");
 
@@ -116,19 +114,21 @@ public class Robot extends TimedRobot {
 
     shootingCounter++;
 
-    double drivingForwards = -m_robotContainer.speed / Math.abs(m_robotContainer.speed);
+    boolean drivingForwards = -m_robotContainer.speed > 0;
     m_robotContainer.readButtons();
     if (m_robotContainer.boostEnabled) {// Turbo mode
-      if (Math.abs(m_robotContainer.direction) < 0.1) {
-        drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction - (offsetDir * drivingForwards));
+      if (Math.abs(m_robotContainer.direction) < 0.1 && Math.abs(m_robotContainer.speed) > 0.1) {
+        //                                                                     v Flip sign if offset direction is backwards
+        drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction - (drivingForwards ? offsetDir : -offsetDir));
         // Drive with the offset
       } else {
         drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction);
         // functionally the same as driving with 0 turn
       }
     } else {
-      if (Math.abs(m_robotContainer.direction) < 0.1) {// Driving straight
-        drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction - (offsetDir * drivingForwards));
+      if (Math.abs(m_robotContainer.direction) < 0.1 && Math.abs(m_robotContainer.speed) > 0.1) {// Driving straight
+        //                                                                            v Flip sign if offset direction is backwards
+        drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction - (drivingForwards ? offsetDir : -offsetDir));
         // Drive with the offset
       } else {
         drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction);
@@ -140,7 +140,7 @@ public class Robot extends TimedRobot {
       }
       if (m_robotContainer.aimBotEnabled) {
         limelight.getGoalPos();
-        AimBot.orientToGoal(limelight.x);
+        AimBot.orientToGoal(limelight.x, drivehumphrey);
       }
     }
 
@@ -176,11 +176,7 @@ public class Robot extends TimedRobot {
       // This right now just sets the variable shooter wheel to the input from the
       // third joystick
     }
-    if (m_robotContainer.intakeInitiated) {
-      Intake.intakeBall(true);
-    } else {
-      Intake.intakeBall(false);
-    }
+    Intake.intakeBall(m_robotContainer.intakeInitiated);
   }
 
   @Override

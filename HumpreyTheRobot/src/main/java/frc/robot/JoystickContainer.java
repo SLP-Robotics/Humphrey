@@ -26,23 +26,6 @@ public class JoystickContainer implements ControllerSystem {
     // a distance lookup table
     public boolean shootInitiated;
 
-    public JoystickContainer() {
-        readButtons();
-    }
-
-    public void readButtons() {
-        speed = center.getY();
-        direction = left.getX();
-        boostEnabled = speedBoost.get();
-        autoCargoEnabled = teleopCargoLock.get();
-        aimBotEnabled = aimBotToggle.get();
-        shootInitiated = shootInitiate.get();
-        inputShooterSpeed = Math.abs(right.getY());
-        // Absolute value to prevent the wheel from spinning backwards which could
-        // cause... idk what could happen, but probably not good
-        intakeInitiated = intakeInitiate.get();
-    }
-
     public double getSpeed() {
         return center.getY();
     };
