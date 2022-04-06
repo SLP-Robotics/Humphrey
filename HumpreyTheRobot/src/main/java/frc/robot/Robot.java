@@ -42,7 +42,7 @@ public class Robot extends TimedRobot {
   public static final double loadTime = 200;// Each of these are in the number of loops executed
   public static final double revTime = 50;// Each of which takes up 20 ms
   public static HumphreyShooter shooter = new HumphreyShooter();
-  public double joystickSetShooterSpeed = 0;
+  // public double joystickSetShooterSpeed = 0;
 
   private void autoCargo() {
     NetworkTableEntry controlActionTable = table.getEntry("action");
@@ -148,8 +148,8 @@ public class Robot extends TimedRobot {
     if (m_robotContainer.shootInitiated) {
       if (!currentlyShooting) {
         currentlyShooting = true;
-        joystickSetShooterSpeed = (2125); // TODO: replace this system with a lookup table
-        System.out.println(joystickSetShooterSpeed);
+        // joystickSetShooterSpeed = (2125);
+        // System.out.println(joystickSetShooterSpeed);
         shootingCounter = 0;
       }
     }
@@ -158,7 +158,7 @@ public class Robot extends TimedRobot {
         // If the current point in time is between when shooting started and the time it
         // takes to rev
         shooter.shoot(shooter.getSpeed(limelight.y));
-        System.out.println("Revving @ " + joystickSetShooterSpeed);
+        System.out.println("Revving @ " + shooter.getSpeed(limelight.y));
       } else if ((shootingCounter > revTime) && (shootingCounter <= (revTime + loadTime))) {
         // If the current point in time is between the time it takes to rev and the time
         // it takes to load
@@ -172,7 +172,6 @@ public class Robot extends TimedRobot {
         // Because the lone intake wheel in the shooter system is set by way of the
         // "motor.set" method
       }
-      // TODO: change the shoot input to a look up table
       // This right now just sets the variable shooter wheel to the input from the
       // third joystick
     } else if (m_robotContainer.manualShooterIntake) {
