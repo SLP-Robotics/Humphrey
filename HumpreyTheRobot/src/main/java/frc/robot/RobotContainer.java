@@ -15,6 +15,10 @@ public class RobotContainer {
     // a distance lookup table
     public boolean shootInitiated;
 
+    public boolean manualShooterIntake;
+    public boolean intakeReverse;
+    public boolean shooterIntakeReverse;
+
     public RobotContainer() {
         readButtons();
     }
@@ -40,7 +44,9 @@ public class RobotContainer {
         // Absolute value to prevent the wheel from spinning backwards which could
         // cause... idk what could happen, but probably not good
         intakeInitiated = controller.getIntakeInitiated();
-
+        intakeReverse = controller.getIntakeReverse();
+        shooterIntakeReverse = controller.getShooterIntakeReverse();
+        manualShooterIntake = controller.getManualShooterIntake();
         // Debora was here
     }
 }

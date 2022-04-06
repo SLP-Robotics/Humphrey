@@ -74,5 +74,23 @@ public class XboxControllerContainerOpt3 implements ControllerSystem {
 
     public boolean getIntakeInitiated() {
         return (xbox.getPOV() == 180);
+    }
+
+    @Override
+    public boolean getIntakeReverse() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean getShooterIntakeReverse() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean getManualShooterIntake() {
+        // TODO Auto-generated method stub
+        return false;
     };
 }

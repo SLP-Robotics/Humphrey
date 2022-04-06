@@ -39,9 +39,8 @@ public class Robot extends TimedRobot {
 
   public int shootingCounter = 0;
   public boolean currentlyShooting = false;
-  public int shootingStartPoint = 14400000;// The equivalent of 4 hours
-  public static final double loadTime = 300;// Each of these are in the number of loops executed
-  public static final double revTime = 75;// Each of which takes up 20 ms
+  public static final double loadTime = 200;// Each of these are in the number of loops executed
+  public static final double revTime = 50;// Each of which takes up 20 ms
   public static HumphreyShooter shooter = new HumphreyShooter();
   public double joystickSetShooterSpeed = 0;
 
@@ -118,8 +117,9 @@ public class Robot extends TimedRobot {
     m_robotContainer.readButtons();
     if (m_robotContainer.boostEnabled) {// Turbo mode
       if (Math.abs(m_robotContainer.direction) < 0.1 && Math.abs(m_robotContainer.speed) > 0.1) {
-        //                                                                     v Flip sign if offset direction is backwards
-        drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction - (drivingForwards ? offsetDir : -offsetDir));
+        // v Flip sign if offset direction is backwards
+        drivehumphrey.drive(m_robotContainer.speed,
+            m_robotContainer.direction - (drivingForwards ? offsetDir : -offsetDir));
         // Drive with the offset
       } else {
         drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction);
@@ -127,8 +127,9 @@ public class Robot extends TimedRobot {
       }
     } else {
       if (Math.abs(m_robotContainer.direction) < 0.1 && Math.abs(m_robotContainer.speed) > 0.1) {// Driving straight
-        //                                                                            v Flip sign if offset direction is backwards
-        drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction - (drivingForwards ? offsetDir : -offsetDir));
+        // v Flip sign if offset direction is backwards
+        drivehumphrey.drive(m_robotContainer.speed * 0.75,
+            m_robotContainer.direction - (drivingForwards ? offsetDir : -offsetDir));
         // Drive with the offset
       } else {
         drivehumphrey.drive(m_robotContainer.speed * 0.75, m_robotContainer.direction);
@@ -147,26 +148,25 @@ public class Robot extends TimedRobot {
     if (m_robotContainer.shootInitiated) {
       if (!currentlyShooting) {
         currentlyShooting = true;
-        shootingStartPoint = shootingCounter;
-        joystickSetShooterSpeed = (m_robotContainer.inputShooterSpeed); // TODO: replace this system with a lookup table
+        joystickSetShooterSpeed = (2125); // TODO: replace this system with a lookup table
+        System.out.println(joystickSetShooterSpeed);
+        shootingCounter = 0;
       }
     }
     if (currentlyShooting) {
-      if ((shootingStartPoint < shootingCounter) && (shootingCounter <= (shootingStartPoint + revTime))) {
+      if (shootingCounter <= revTime) {
         // If the current point in time is between when shooting started and the time it
         // takes to rev
         HumphreyShooter.shoot(joystickSetShooterSpeed);
         System.out.println("Revving @ " + joystickSetShooterSpeed);
-      } else if (((shootingStartPoint + revTime) < shootingCounter)
-          && (shootingCounter <= (shootingStartPoint + revTime + loadTime))) {
+      } else if ((shootingCounter > revTime) && (shootingCounter <= (revTime + loadTime))) {
         // If the current point in time is between the time it takes to rev and the time
         // it takes to load
         HumphreyShooter.shoot(joystickSetShooterSpeed);
         HumphreyShooter.shooterIntake();
-        System.out.println("Intaking and shooting @ " + joystickSetShooterSpeed);
-      } else if (shootingCounter > (shootingStartPoint + revTime + loadTime)) {// If it is past the time to load
+        // System.out.println("Intaking and shooting @ " + joystickSetShooterSpeed);
+      } else if (shootingCounter > (revTime + loadTime)) {// If it is past the time to load
         currentlyShooting = false;
-        shootingStartPoint = 14400000;
         HumphreyShooter.stopShooting();// Stop the system from spinning the shooter motors
         HumphreyShooter.stopShooterIntake();
         // Because the lone intake wheel in the shooter system is set by way of the
@@ -175,8 +175,19 @@ public class Robot extends TimedRobot {
       // TODO: change the shoot input to a look up table
       // This right now just sets the variable shooter wheel to the input from the
       // third joystick
+    } else if (m_robotContainer.manualShooterIntake) {
+      HumphreyShooter.load2Intake();
+    } else if (m_robotContainer.shooterIntakeReverse) {
+      HumphreyShooter.reverseShooterIntake();
+    } else {
+      HumphreyShooter.stopShooterIntake();
     }
-    Intake.intakeBall(m_robotContainer.intakeInitiated);
+
+    if (m_robotContainer.intakeReverse) {
+      Intake.reverse();
+    } else {
+      Intake.intakeBall(m_robotContainer.intakeInitiated);
+    }
   }
 
   @Override
