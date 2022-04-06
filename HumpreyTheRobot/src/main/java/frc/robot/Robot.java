@@ -157,18 +157,18 @@ public class Robot extends TimedRobot {
       if (shootingCounter <= revTime) {
         // If the current point in time is between when shooting started and the time it
         // takes to rev
-        HumphreyShooter.shoot(joystickSetShooterSpeed);
+        shooter.shoot(shooter.getSpeed(limelight.y));
         System.out.println("Revving @ " + joystickSetShooterSpeed);
       } else if ((shootingCounter > revTime) && (shootingCounter <= (revTime + loadTime))) {
         // If the current point in time is between the time it takes to rev and the time
         // it takes to load
-        HumphreyShooter.shoot(joystickSetShooterSpeed);
-        HumphreyShooter.shooterIntake();
+        shooter.shoot(shooter.getSpeed(limelight.y));
+        shooter.shooterIntake();
         // System.out.println("Intaking and shooting @ " + joystickSetShooterSpeed);
       } else if (shootingCounter > (revTime + loadTime)) {// If it is past the time to load
         currentlyShooting = false;
-        HumphreyShooter.stopShooting();// Stop the system from spinning the shooter motors
-        HumphreyShooter.stopShooterIntake();
+        shooter.stopShooting();// Stop the system from spinning the shooter motors
+        shooter.stopShooterIntake();
         // Because the lone intake wheel in the shooter system is set by way of the
         // "motor.set" method
       }
@@ -176,11 +176,11 @@ public class Robot extends TimedRobot {
       // This right now just sets the variable shooter wheel to the input from the
       // third joystick
     } else if (m_robotContainer.manualShooterIntake) {
-      HumphreyShooter.load2Intake();
+      shooter.load2Intake();
     } else if (m_robotContainer.shooterIntakeReverse) {
-      HumphreyShooter.reverseShooterIntake();
+      shooter.reverseShooterIntake();
     } else {
-      HumphreyShooter.stopShooterIntake();
+      shooter.stopShooterIntake();
     }
 
     if (m_robotContainer.intakeReverse) {

@@ -43,7 +43,14 @@ public class HumphreyShooter {
         constantWheel.setSensorPhase(true);
 
         // input all needed values
-        yValuesToSpeeds.put(-20.0, 3.0);
+        yValuesToSpeeds.put(-3.5, 3100.0); // 150in
+        yValuesToSpeeds.put(-2.3, 2750.0); // 138in
+        yValuesToSpeeds.put(-0.27, 2550.0); // 126in
+        yValuesToSpeeds.put(2.36, 2350.0); // 114in
+        yValuesToSpeeds.put(4.38, 2325.0); // 102in
+        yValuesToSpeeds.put(7.08, 2220.0); // 90in
+        yValuesToSpeeds.put(10.24, 2125.0); // 78in
+        yValuesToSpeeds.put(13.53, 2000.0); // 66in
     }
 
     public double getSpeed(double yValue) {
@@ -55,7 +62,7 @@ public class HumphreyShooter {
         return speed;
     }
 
-    public static void shoot(double wheelSpeed) {
+    public void shoot(double wheelSpeed) {
         constantWheel.set(TalonFXControlMode.Velocity, constantWheelSpeed);
         changingWheel.set(TalonFXControlMode.Velocity,
                 wheelSpeed * invPollRate * minutesPerSecond * ticksPerRotation);
@@ -65,25 +72,25 @@ public class HumphreyShooter {
         // System.out.println("shooting: " + constantWheelSpeed + ", " + wheelSpeed);
     }
 
-    public static void stopShooting() {
+    public void stopShooting() {
         constantWheel.set(TalonFXControlMode.Velocity, 0);
         changingWheel.set(TalonFXControlMode.Velocity, 0);
     }
 
-    public static void shooterIntake() {
+    public void shooterIntake() {
         intakeWheel.set(-1);
         // System.out.println("shooter intake");
     }
 
-    public static void stopShooterIntake() {
+    public void stopShooterIntake() {
         intakeWheel.set(0);
     }
 
-    public static void load2Intake() {
+    public void load2Intake() {
         intakeWheel.set(-1);
     }
 
-    public static void reverseShooterIntake() {
+    public void reverseShooterIntake() {
         intakeWheel.set(1);
     }
 
