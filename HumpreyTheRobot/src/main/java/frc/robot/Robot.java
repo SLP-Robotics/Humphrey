@@ -49,16 +49,16 @@ public class Robot extends TimedRobot {
     String action = controlActionTable.getString("none");
     if (action.equals("stop")) {
       System.out.println("stop");
-      drivehumphrey.drive(0, 0.6);
+      drivehumphrey.drive(0, -0.6);
     } else if (action.equals("right")) {
       System.out.println("right");
-      drivehumphrey.drive(-0.6, 0.6);
+      drivehumphrey.drive(0.6, -0.6);
     } else if (action.equals("left")) {
       System.out.println("left");
-      drivehumphrey.drive(-0.6, -0.6);
+      drivehumphrey.drive(0.6, 0.6);
     } else if (action.equals("center")) {
       System.out.println("center");
-      drivehumphrey.drive(-0.5, 0);
+      drivehumphrey.drive(0.5, 0);
     }
   }
 
