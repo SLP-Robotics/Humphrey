@@ -1,41 +1,97 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import java.util.HashMap;
+import java.util.TreeMap;
 
 public class HumphreyShooter {
     static WPI_TalonFX constantWheel = new WPI_TalonFX(6);
     static WPI_TalonFX changingWheel = new WPI_TalonFX(7);
     static WPI_VictorSPX intakeWheel = new WPI_VictorSPX(8);
-    public static final double constantWheelSpeed = 1;// This we can preset until we find a value we like
+    static final double gP = 0.1;
+    static final double gF = 0.1;
+    private static final double ticksPerRotation = 2048;
+    private static final double invPollRate = 0.1;
+    private static final double minutesPerSecond = 1.0 / 60.0;
+    private static final double RPM = 2250;
+    public static final double constantWheelSpeed = RPM * invPollRate * minutesPerSecond * ticksPerRotation;
+    // This we can preset until we find a value we like
     // Based on the situation of the motors and their placement, we might need to
     // invert this? So that the motors actually shoot the ball and dont just spin it
     // in place
-    public static DifferentialDrive shooters = new DifferentialDrive(constantWheel, changingWheel);
-    public static HashMap<Double, Double> yValuesToSpeeds = new HashMap<>();
 
-    public HumphreyShooter() {
-        yValuesToSpeeds.put(-20.0, 3.0);
+    public static TreeMap<Double, Double> yValuesToSpeeds = new TreeMap<>();
+
+    static {
+        changingWheel.configFactoryDefault();
+        changingWheel.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+        changingWheel.config_kP(0, gP);
+        changingWheel.config_kF(0, gF);
+        changingWheel.setNeutralMode(NeutralMode.Coast);
+        changingWheel.setSensorPhase(true);
+        changingWheel.setInverted(true);
+
+        constantWheel.configFactoryDefault();
+        constantWheel.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+        constantWheel.config_kP(0, gP);
+        constantWheel.config_kF(0, gF);
+        constantWheel.setNeutralMode(NeutralMode.Coast);
+        constantWheel.setSensorPhase(true);
+
+        // input all needed values
+        yValuesToSpeeds.put(-3.5, 3100.0); // 150in
+        yValuesToSpeeds.put(-2.3, 2750.0); // 138in
+        yValuesToSpeeds.put(-0.27, 2550.0); // 126in
+        yValuesToSpeeds.put(2.36, 2350.0); // 114in
+        yValuesToSpeeds.put(4.38, 2325.0); // 102in
+        yValuesToSpeeds.put(7.08, 2220.0); // 90in
+        yValuesToSpeeds.put(10.24, 2125.0); // 78in
+        yValuesToSpeeds.put(13.53, 2000.0); // 66in
     }
 
-    public static void shoot(double wheelSpeed) {
-        shooters.tankDrive(constantWheelSpeed, wheelSpeed * -1);
+    public double getSpeed(double yValue) {
+        double smallerY = yValuesToSpeeds.floorEntry(yValue).getValue();
+        double largerY = yValuesToSpeeds.ceilingEntry(yValue).getValue();
+        double percentage = (yValue - smallerY) / (largerY - smallerY);
+        double speed = Math.abs(yValuesToSpeeds.get(smallerY)
+                + percentage * (yValuesToSpeeds.get(largerY) - yValuesToSpeeds.get(smallerY)));
+        return speed;
+    }
+
+    public void shoot(double wheelSpeed) {
+        constantWheel.set(TalonFXControlMode.Velocity, constantWheelSpeed);
+        changingWheel.set(TalonFXControlMode.Velocity,
+                wheelSpeed * invPollRate * minutesPerSecond * ticksPerRotation);
+        // System.out.println("Real: " + changingWheel.getSelectedSensorVelocity() + "
+        // Target: "
+        // + wheelSpeed * 6000 * invPollRate * minutesPerSecond * ticksPerRotation);
         // System.out.println("shooting: " + constantWheelSpeed + ", " + wheelSpeed);
     }
 
-    public static void stopShooting() {
-        shooters.tankDrive(0, 0);
+    public void stopShooting() {
+        constantWheel.set(TalonFXControlMode.Velocity, 0);
+        changingWheel.set(TalonFXControlMode.Velocity, 0);
     }
 
-    public static void shooterIntake() {
+    public void shooterIntake() {
         intakeWheel.set(-1);
         // System.out.println("shooter intake");
     }
 
-    public static void stopShooterIntake() {
+    public void stopShooterIntake() {
         intakeWheel.set(0);
     }
+
+    public void load2Intake() {
+        intakeWheel.set(-1);
+    }
+
+    public void reverseShooterIntake() {
+        intakeWheel.set(1);
+    }
+
 }

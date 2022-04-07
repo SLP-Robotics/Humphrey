@@ -17,4 +17,10 @@ public interface ControllerSystem {
 
     public boolean getIntakeInitiated();
 
+    public boolean getIntakeReverse();
+
+    public boolean getShooterIntakeReverse();
+
+    public boolean getManualShooterIntake();
+
 }

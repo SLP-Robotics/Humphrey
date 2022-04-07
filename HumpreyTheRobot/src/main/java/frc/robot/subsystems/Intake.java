@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-
 public class Intake {
 
     // change motor names and change values
@@ -14,9 +12,6 @@ public class Intake {
     // I don't know how fast this needs to be, I have it set really slow so nothing
     // breaks
 
-    public static DifferentialDrive drive = new DifferentialDrive(intakeMotor1, intakeMotor1);
-    // Will this break everything? I don't know
-
     public static void intakeBall(boolean intakeOrNot) {
         if (intakeOrNot) {
             intakeMotor1.set(intakeWheelSpeed);
@@ -24,6 +19,10 @@ public class Intake {
         } else {
             intakeMotor1.set(0);
         }
+    }
+
+    public static void reverse() {
+        intakeMotor1.set(-0.2);
     }
 
 }

@@ -69,6 +69,24 @@ public class XboxControllerContainerOpt1 implements ControllerSystem {
 
     public boolean getIntakeInitiated() {
         return (xbox.getLeftTriggerAxis() > 0.1);
+    }
+
+    @Override
+    public boolean getIntakeReverse() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean getShooterIntakeReverse() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean getManualShooterIntake() {
+        // TODO Auto-generated method stub
+        return false;
     };
 
 }
