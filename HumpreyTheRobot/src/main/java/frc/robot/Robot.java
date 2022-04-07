@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.subsystems.AimBot;
+import frc.robot.subsystems.ColorChecker;
 import frc.robot.subsystems.DriveHumphrey;
 import frc.robot.subsystems.HumphreyShooter;
 import frc.robot.subsystems.Intake;
@@ -27,8 +28,9 @@ public class Robot extends TimedRobot {
 
   public static DriveHumphrey drivehumphrey = new DriveHumphrey();
   public RobotContainer m_robotContainer;
+  public ColorChecker cchecker = new ColorChecker();
   public int autoRuns = 0;
-  public static final double reverseTimeS = 0.1;
+  public static final double reverseTimeS = 1;
   public static final double autonomousPeriodTimeS = 0.02;
   public static final double autonomousReverseCycles = reverseTimeS / autonomousPeriodTimeS;
   NetworkTableInstance inst;
@@ -62,6 +64,30 @@ public class Robot extends TimedRobot {
     }
   }
 
+  private void shootingRoutine() {
+    if (shootingCounter <= revTime) {
+      // If the current point in time is between when shooting started and the time it
+      // takes to rev
+      shooter.shoot(shooter.getSpeed(limelight.y));
+      System.out.println("Revving @ " + shooter.getSpeed(limelight.y));
+    } else if ((shootingCounter > revTime) && (shootingCounter <= (revTime + loadTime))) {
+      // If the current point in time is between the time it takes to rev and the time
+      // it takes to load
+      shooter.shoot(shooter.getSpeed(limelight.y));
+      shooter.shooterIntake();
+      // System.out.println("Intaking and shooting @ " + joystickSetShooterSpeed);
+    } else if (shootingCounter > (revTime + loadTime)) {// If it is past the time to load
+      currentlyShooting = false;
+      shooter.stopShooting();// Stop the system from spinning the shooter motors
+      shooter.stopShooterIntake();
+      // Because the lone intake wheel in the shooter system is set by way of the
+      // "motor.set" method
+    }
+    // This right now just sets the variable shooter wheel to the input from the
+    // third joystick
+
+  }
+
   /**
    * This function is run when the robot is first started up and should be used
    * for any
@@ -89,6 +115,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
+    limelight.getGoalPos();
     autoRuns += 1;
     if (autoRuns <= autonomousReverseCycles) {
       drivehumphrey.drive(0.75, 0);
@@ -97,7 +124,19 @@ public class Robot extends TimedRobot {
     }
     // orient to goal and shoot preloaded cargo before autoCargo
     if (autoRuns >= autonomousReverseCycles) {
-      autoCargo();
+      if (cchecker.ballPresent()) {
+        if (!currentlyShooting && AimBot.orientToGoal(limelight.x, drivehumphrey)) {
+          currentlyShooting = true;
+          shootingCounter = 0;
+        }
+        if (currentlyShooting) {
+          shootingRoutine();
+
+        }
+      } else {
+        autoCargo();
+      }
+
     }
   }
 
@@ -110,7 +149,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-
+    limelight.getGoalPos();
     shootingCounter++;
 
     boolean drivingForwards = -m_robotContainer.speed > 0;
@@ -140,7 +179,6 @@ public class Robot extends TimedRobot {
         autoCargo();
       }
       if (m_robotContainer.aimBotEnabled) {
-        limelight.getGoalPos();
         AimBot.orientToGoal(limelight.x, drivehumphrey);
       }
     }
@@ -154,26 +192,7 @@ public class Robot extends TimedRobot {
       }
     }
     if (currentlyShooting) {
-      if (shootingCounter <= revTime) {
-        // If the current point in time is between when shooting started and the time it
-        // takes to rev
-        shooter.shoot(shooter.getSpeed(limelight.y));
-        System.out.println("Revving @ " + shooter.getSpeed(limelight.y));
-      } else if ((shootingCounter > revTime) && (shootingCounter <= (revTime + loadTime))) {
-        // If the current point in time is between the time it takes to rev and the time
-        // it takes to load
-        shooter.shoot(shooter.getSpeed(limelight.y));
-        shooter.shooterIntake();
-        // System.out.println("Intaking and shooting @ " + joystickSetShooterSpeed);
-      } else if (shootingCounter > (revTime + loadTime)) {// If it is past the time to load
-        currentlyShooting = false;
-        shooter.stopShooting();// Stop the system from spinning the shooter motors
-        shooter.stopShooterIntake();
-        // Because the lone intake wheel in the shooter system is set by way of the
-        // "motor.set" method
-      }
-      // This right now just sets the variable shooter wheel to the input from the
-      // third joystick
+      shootingRoutine();
     } else if (m_robotContainer.manualShooterIntake) {
       shooter.load2Intake();
     } else if (m_robotContainer.shooterIntakeReverse) {

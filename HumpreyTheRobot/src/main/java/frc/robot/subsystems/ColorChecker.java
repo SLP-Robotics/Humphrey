@@ -7,7 +7,7 @@ public class ColorChecker {
     private final ColorSensorV3 sensor = new ColorSensorV3(Port.kOnboard);
     private static final int BLUE_THRESHOLD = 127;
     private static final int RED_THRESHOLD = 127;
-    private static final int PROXIMITY_THRESHOLD = 127;
+    private static final int PROXIMITY_THRESHOLD = 140;
 
     public boolean isRed() {
         System.out.println("Red is " + Integer.toString(sensor.getRed()));
@@ -21,6 +21,6 @@ public class ColorChecker {
 
     public boolean ballPresent() {
         System.out.println("Proximity is " + Integer.toString(sensor.getProximity()));
-        return sensor.getProximity() < PROXIMITY_THRESHOLD;
+        return sensor.getProximity() > PROXIMITY_THRESHOLD;
     }
 }

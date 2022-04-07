@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
+import java.util.Map;
 import java.util.TreeMap;
 
 public class HumphreyShooter {
@@ -24,7 +25,7 @@ public class HumphreyShooter {
     // invert this? So that the motors actually shoot the ball and dont just spin it
     // in place
 
-    public static TreeMap<Double, Double> yValuesToSpeeds = new TreeMap<>();
+    public static final TreeMap<Double, Double> yValuesToSpeeds = new TreeMap<>();
 
     static {
         changingWheel.configFactoryDefault();
@@ -43,23 +44,34 @@ public class HumphreyShooter {
         constantWheel.setSensorPhase(true);
 
         // input all needed values
-        yValuesToSpeeds.put(-3.5, 3100.0); // 150in
-        yValuesToSpeeds.put(-2.3, 2750.0); // 138in
-        yValuesToSpeeds.put(-0.27, 2550.0); // 126in
-        yValuesToSpeeds.put(2.36, 2350.0); // 114in
-        yValuesToSpeeds.put(4.38, 2325.0); // 102in
-        yValuesToSpeeds.put(7.08, 2220.0); // 90in
-        yValuesToSpeeds.put(10.24, 2125.0); // 78in
-        yValuesToSpeeds.put(13.53, 2000.0); // 66in
+        yValuesToSpeeds.put(-2.25, 3100.0); // 150in
+        yValuesToSpeeds.put(-0.69, 2750.0); // 138in
+        yValuesToSpeeds.put(1.2, 2550.0); // 126in
+        yValuesToSpeeds.put(3.14, 2350.0); // 114in
+        yValuesToSpeeds.put(5.50, 2325.0); // 102in
+        yValuesToSpeeds.put(8.0, 2220.0); // 90in
+        yValuesToSpeeds.put(11.4, 2125.0); // 78in
+        yValuesToSpeeds.put(15.0, 2000.0); // 66in
     }
 
     public double getSpeed(double yValue) {
-        double smallerY = yValuesToSpeeds.floorEntry(yValue).getValue();
-        double largerY = yValuesToSpeeds.ceilingEntry(yValue).getValue();
+        Map.Entry<Double, Double> smallerEntry = yValuesToSpeeds.floorEntry(yValue);
+        if (null == smallerEntry) {
+            System.err.println("Goal too close to determine shooter speed");
+            return 0;
+        }
+        Map.Entry<Double, Double> largerEntry = yValuesToSpeeds.ceilingEntry(yValue);
+        if (null == largerEntry) {
+            System.err.println("Goal too far to determine shooter speed");
+            return 0;
+        }
+        double smallerSpeed = smallerEntry.getValue();
+        double largerSpeed = largerEntry.getValue();
+        double smallerY = smallerEntry.getKey();
+        double largerY = largerEntry.getKey();
         double percentage = (yValue - smallerY) / (largerY - smallerY);
-        double speed = Math.abs(yValuesToSpeeds.get(smallerY)
-                + percentage * (yValuesToSpeeds.get(largerY) - yValuesToSpeeds.get(smallerY)));
-        return speed;
+        double speedRange = largerSpeed - smallerSpeed;
+        return smallerSpeed + (speedRange * percentage);
     }
 
     public void shoot(double wheelSpeed) {

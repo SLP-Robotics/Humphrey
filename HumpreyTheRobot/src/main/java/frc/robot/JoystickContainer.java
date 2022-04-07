@@ -11,7 +11,7 @@ public class JoystickContainer implements ControllerSystem {
     public Joystick right = new Joystick(2);
     final JoystickButton speedBoost = new JoystickButton(center, 3);
     final JoystickButton teleopCargoLock = new JoystickButton(left, 3);
-    final JoystickButton aimBotToggle = new JoystickButton(right, 3);
+    final JoystickButton aimBotToggle = new JoystickButton(center, 2);
 
     public double speed, direction;
     public boolean boostEnabled;

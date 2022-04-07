@@ -17,7 +17,7 @@ from tkinter import ttk
 sd = 0
 
 # start video stream capture
-vcap = cv2.VideoCapture(0)
+vcap = cv2.VideoCapture(3)
 path = 'C:/Users/jonas/Documents/GitHub/Humphrey/gerry-vision/visionmodels/v3.pt'
 # import desired model
 model = torch.hub.load('', 'custom', path=path, source='local')
@@ -98,10 +98,11 @@ size_xymid_red = []
 size_xymid_bumper = []
 split_size = []
 split_xymid = []
+runint = 0
 
 def put_action(action):
     global sd
-    sd.putString('action', action)
+    #sd.putString('action', action)
 
 # image processing loop
 def processing():
@@ -122,6 +123,7 @@ def processing():
         global split_xymid
         global largest_item_int
         global sd
+        global runint
         # reset object variables every frame
         largest_item_int = 0
         split_size = []
@@ -135,9 +137,12 @@ def processing():
         detections_previous = detections
         detections = {}
         # pull video frame-by-frame
-        ret, frame = vcap.read()
-        cropped_image = frame[320:0, 720:240]
-
+        try:
+            ret, frame = vcap.read()
+            cropped_image = frame[0:120, 160:320]
+        except:
+            print('error')
+            continue
         # display the current frame
         cv2.imshow("frame", cropped_image)
 
@@ -160,7 +165,7 @@ def processing():
             # get the size of every object
             obj_size = (((xmax.item() - xmin.item()) ** 2 + (ymax.item() - ymin.item()) ** 2) ** 0.5)
 
-            # visualize the center of the object with a green dot
+                # visualize the center of the object with a green dot
             center_vis = cv2.line(cropped_image, (int(xy_center[0]), int(xy_center[1])),
                                   (int(xy_center[0]), int(xy_center[1])),
                                   (0, 255, 0), 15)
@@ -187,9 +192,12 @@ def processing():
             # length_int += 1
         if selected_algorithm == 'size':
             try:
+                print(runint)
+                runint += 1
                 # purposefully crash the code to get caught by the try except
                 crash = results.pandas().xyxy[0]
                 if selected_color == 'blue':
+                    print('blue')
                     for detected_cargo in size_xymid_blue:
                         split_size.append(detected_cargo[1])
                         split_xymid.append(detected_cargo[0])
@@ -220,6 +228,7 @@ def processing():
                         put_action('stop')
 
                 elif selected_color == 'red':
+                    print('red')
                     for detected_cargo in size_xymid_red:
                         split_size.append(detected_cargo[1])
                         split_xymid.append(detected_cargo[0])
@@ -253,7 +262,6 @@ def processing():
                 print('stop')
                 put_action('stop')
         runs += 1
-
         if cv2.waitKey(22) & 0xFF == ord('q'):
             vcap.release()
             cv2.destroyAllWindows()

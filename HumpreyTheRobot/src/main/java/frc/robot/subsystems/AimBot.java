@@ -26,7 +26,7 @@ public class AimBot {
 
     }
 
-    public static void orientToGoal(double angle, DriveHumphrey drive) {
+    public static boolean orientToGoal(double angle, DriveHumphrey drive) {
         // turn the robot (control the robot)
 
         if (angle < -TURNING_ERROR_MARGIN) {
@@ -35,7 +35,10 @@ public class AimBot {
         } else if (angle > TURNING_ERROR_MARGIN) {
             // turn to the right
             drive.drive(0, 0.62);
+        } else {
+            return true;
         }
+        return false;
 
     }
 
