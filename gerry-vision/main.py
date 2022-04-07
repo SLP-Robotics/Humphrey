@@ -17,7 +17,7 @@ from tkinter import ttk
 sd = 0
 
 # start video stream capture
-vcap = cv2.VideoCapture('0')
+vcap = cv2.VideoCapture(0)
 path = 'C:/Users/jonas/Documents/GitHub/Humphrey/gerry-vision/visionmodels/v3.pt'
 # import desired model
 model = torch.hub.load('', 'custom', path=path, source='local')
@@ -136,13 +136,14 @@ def processing():
         detections = {}
         # pull video frame-by-frame
         ret, frame = vcap.read()
+        cropped_image = frame[320:0, 720:240]
 
         # display the current frame
-        cv2.imshow("frame", frame)
+        cv2.imshow("frame", cropped_image)
 
         width = frame.shape[1]
 
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame_rgb = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB)
         # inference
         results = model(frame_rgb)
 
@@ -160,7 +161,7 @@ def processing():
             obj_size = (((xmax.item() - xmin.item()) ** 2 + (ymax.item() - ymin.item()) ** 2) ** 0.5)
 
             # visualize the center of the object with a green dot
-            center_vis = cv2.line(frame, (int(xy_center[0]), int(xy_center[1])),
+            center_vis = cv2.line(cropped_image, (int(xy_center[0]), int(xy_center[1])),
                                   (int(xy_center[0]), int(xy_center[1])),
                                   (0, 255, 0), 15)
 
@@ -197,7 +198,7 @@ def processing():
 
                     closestxy = split_xymid[largest_item_int]
 
-                    closest_vis = cv2.line(frame, (int(closestxy[0]), int(closestxy[1])),
+                    closest_vis = cv2.line(cropped_image, (int(closestxy[0]), int(closestxy[1])),
                                            (int(closestxy[0]), int(closestxy[1])), (0, 0, 255), 15)
 
                     # display combined images
@@ -227,7 +228,7 @@ def processing():
 
                     closestxy = split_xymid[largest_item_int]
 
-                    closest_vis = cv2.line(frame, (int(closestxy[0]), int(closestxy[1])),
+                    closest_vis = cv2.line(cropped_image, (int(closestxy[0]), int(closestxy[1])),
                                            (int(closestxy[0]), int(closestxy[1])), (255, 0, 0), 15)
 
                     # display combined images
