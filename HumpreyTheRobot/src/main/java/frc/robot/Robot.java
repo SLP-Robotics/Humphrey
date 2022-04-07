@@ -30,9 +30,8 @@ public class Robot extends TimedRobot {
   public RobotContainer m_robotContainer;
   public ColorChecker cchecker = new ColorChecker();
   public int autoRuns = 0;
+  private long autoStartTime = 0;
   public static final double reverseTimeS = 1;
-  public static final double autonomousPeriodTimeS = 0.02;
-  public static final double autonomousReverseCycles = reverseTimeS / autonomousPeriodTimeS;
   NetworkTableInstance inst;
   NetworkTable table;
   public static final double offsetDir = -0.3;
@@ -65,11 +64,11 @@ public class Robot extends TimedRobot {
   }
 
   private void shootingRoutine() {
+    shootingCounter++;
     if (shootingCounter <= revTime) {
       // If the current point in time is between when shooting started and the time it
       // takes to rev
       shooter.shoot(shooter.getSpeed(limelight.y));
-      System.out.println("Revving @ " + shooter.getSpeed(limelight.y));
     } else if ((shootingCounter > revTime) && (shootingCounter <= (revTime + loadTime))) {
       // If the current point in time is between the time it takes to rev and the time
       // it takes to load
@@ -110,21 +109,23 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     System.out.println("autoinit");
+    autoStartTime = System.currentTimeMillis();
     autoRuns = 0;
   }
 
   @Override
   public void autonomousPeriodic() {
     limelight.getGoalPos();
-    autoRuns += 1;
-    if (autoRuns <= autonomousReverseCycles) {
+    final long currentAutoTime = System.currentTimeMillis() - autoStartTime;
+    if (currentAutoTime < (reverseTimeS * 1000)) {
       drivehumphrey.drive(0.75, 0);
     } else {
       drivehumphrey.drive(0, 0);
     }
     // orient to goal and shoot preloaded cargo before autoCargo
-    if (autoRuns >= autonomousReverseCycles) {
+    if (currentAutoTime >= (reverseTimeS * 1000)) {
       if (cchecker.ballPresent()) {
+        AimBot.orientToGoal(limelight.x, drivehumphrey);
         if (!currentlyShooting && AimBot.orientToGoal(limelight.x, drivehumphrey)) {
           currentlyShooting = true;
           shootingCounter = 0;
@@ -144,13 +145,12 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     shootingCounter = 0;
     System.out.println("starting teleop");
-
+    currentlyShooting = false;
   }
 
   @Override
   public void teleopPeriodic() {
     limelight.getGoalPos();
-    shootingCounter++;
 
     boolean drivingForwards = -m_robotContainer.speed > 0;
     m_robotContainer.readButtons();

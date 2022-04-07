@@ -71,7 +71,10 @@ public class HumphreyShooter {
         double largerY = largerEntry.getKey();
         double percentage = (yValue - smallerY) / (largerY - smallerY);
         double speedRange = largerSpeed - smallerSpeed;
-        return smallerSpeed + (speedRange * percentage);
+        double speed = smallerSpeed + (speedRange * percentage);
+        System.out.println("Revving @ " + speed + ", Y-Value = " + yValue);
+        return speed;
+        
     }
 
     public void shoot(double wheelSpeed) {
