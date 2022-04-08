@@ -26,10 +26,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  */
 public class Robot extends TimedRobot {
 
-  public static DriveHumphrey drivehumphrey = new DriveHumphrey();
-  public static AimBot aimbot;
+  private final DriveHumphrey drivehumphrey = new DriveHumphrey();
+  private final AimBot aimbot = new AimBot();
   public RobotContainer m_robotContainer;
-  public ColorChecker cchecker = new ColorChecker();
+  private final ColorChecker cchecker = new ColorChecker();
   public int autoRuns = 0;
   private long autoStartTime = 0;
   public static final double reverseTimeS = 1;
@@ -39,10 +39,10 @@ public class Robot extends TimedRobot {
   // This is the offset amount for the robot's driving: must be changed when new
   // weight is added
 
-  public int shootingCounter = 0;
+  public int loadingCounter = 0;
   public boolean currentlyShooting = false;
   public static final double loadTime = 200;// Each of these are in the number of loops executed
-  public static final double revTime = 50;// Each of which takes up 20 ms
+  public static final double revTime = 50;// Each of which takes up 50 ms
   public static HumphreyShooter shooter = new HumphreyShooter();
   // public double joystickSetShooterSpeed = 0;
 
@@ -65,23 +65,20 @@ public class Robot extends TimedRobot {
   }
 
   private void shootingRoutine() {
-    shootingCounter++;
-    if (shootingCounter <= revTime) {
-      // If the current point in time is between when shooting started and the time it
-      // takes to rev
-      shooter.shoot(shooter.getSpeed(limelight.y));
-    } else if ((shootingCounter > revTime) && (shootingCounter <= (revTime + loadTime))) {
-      // If the current point in time is between the time it takes to rev and the time
-      // it takes to load
-      shooter.shoot(shooter.getSpeed(limelight.y));
-      shooter.shooterIntake();
-      // System.out.println("Intaking and shooting @ " + joystickSetShooterSpeed);
-    } else if (shootingCounter > (revTime + loadTime)) {// If it is past the time to load
+    shooter.shoot(shooter.getSpeed(limelight.y));
+    if (loadingCounter > loadTime) {// If it is past the time to load
       currentlyShooting = false;
       shooter.stopShooting();// Stop the system from spinning the shooter motors
       shooter.stopShooterIntake();
+      return;
       // Because the lone intake wheel in the shooter system is set by way of the
       // "motor.set" method
+    } else if (shooter.isReadyToFeed()) {
+      loadingCounter++;
+      // If the current point in time is between the time it takes to rev and the time
+      // it takes to load
+      shooter.shooterIntake();
+      // System.out.println("Intaking and shooting @ " + joystickSetShooterSpeed);
     }
     // This right now just sets the variable shooter wheel to the input from the
     // third joystick
@@ -109,7 +106,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    aimbot = new AimBot();
     System.out.println("autoinit");
     autoStartTime = System.currentTimeMillis();
     autoRuns = 0;
@@ -122,24 +118,17 @@ public class Robot extends TimedRobot {
     if (currentAutoTime < (reverseTimeS * 1000)) {
       drivehumphrey.drive(0.75, 0);
     } else {
-      drivehumphrey.drive(0, 0);
-    }
-    // orient to goal and shoot preloaded cargo before autoCargo
-    if (currentAutoTime >= (reverseTimeS * 1000)) {
+      // orient to goal and shoot preloaded cargo before autoCargo
       if (cchecker.ballPresent()) {
-        Intake.intakeBall(false);
-        aimbot.orientToGoal(limelight.x, drivehumphrey, table);
-        if (!currentlyShooting && aimbot.orientToGoal(limelight.x, drivehumphrey, table)) {
+        if (!currentlyShooting && AimBot.orientToGoal(limelight.x, drivehumphrey)) {
           currentlyShooting = true;
-          shootingCounter = 0;
+          loadingCounter = 0;
         }
         if (currentlyShooting) {
           shootingRoutine();
-
+          drivehumphrey.drive(0, 0);
         }
-      } else {
-        Intake.intakeBall(true);
-        autoCargo();
+        
       }
 
     }
@@ -147,8 +136,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    aimbot = new AimBot();
-    shootingCounter = 0;
+    loadingCounter = 0;
     System.out.println("starting teleop");
     currentlyShooting = false;
   }
@@ -184,7 +172,7 @@ public class Robot extends TimedRobot {
         autoCargo();
       }
       if (m_robotContainer.aimBotEnabled) {
-        aimbot.orientToGoal(limelight.x, drivehumphrey, table);
+        AimBot.orientToGoal(limelight.x, drivehumphrey);
       }
     }
 
@@ -193,7 +181,7 @@ public class Robot extends TimedRobot {
         currentlyShooting = true;
         // joystickSetShooterSpeed = (2125);
         // System.out.println(joystickSetShooterSpeed);
-        shootingCounter = 0;
+        loadingCounter = 0;
       }
     }
     if (currentlyShooting) {
@@ -221,13 +209,25 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {
   }
 
+  private long startedRunning = 0;
+
   @Override
   public void testInit() {
+    startedRunning = System.currentTimeMillis();
   }
+
+  private double target_rpm = 2000;
+  private boolean wasAtSpeed = false;
 
   @Override
   public void testPeriodic() {
     m_robotContainer.readButtons();
-    drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction);
+    // drivehumphrey.drive(m_robotContainer.speed, m_robotContainer.direction);
+    shooter.shoot(target_rpm);
+    if (!wasAtSpeed && shooter.isReadyToFeed()) {
+      wasAtSpeed = true;
+      System.out.println("Spinup took " + (System.currentTimeMillis() - startedRunning));
+    }
+
   }
 }

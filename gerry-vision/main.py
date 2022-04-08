@@ -165,13 +165,6 @@ def processing():
                                   (int(xy_center[0]), int(xy_center[1])),
                                   (0, 255, 0), 15)
 
-            auto_display = sd.getString('autoDisplay')
-            if auto_display == 'notOriented':
-                orient_vis = cv2.line(frame, 0, 0, 240, 240, (0, 0, 255), 15)
-            if auto_display == 'Orienting':
-                orient_vis = cv2.line(frame, 0, 0, 240, 240, (0, 255, 255), 15)
-            if auto_display == 'Oriented':
-                orient_vis = cv2.line(frame, 0, 0, 240, 240, (0, 255, 0), 15)
             # sort objects by class into a more readable format
             if c == 0:
                 size_xymid_blue.append([xy_center, obj_size])

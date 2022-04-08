@@ -10,16 +10,17 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class HumphreyShooter {
-    static WPI_TalonFX constantWheel = new WPI_TalonFX(6);
-    static WPI_TalonFX changingWheel = new WPI_TalonFX(7);
-    static WPI_VictorSPX intakeWheel = new WPI_VictorSPX(8);
-    static final double gP = 0.1;
-    static final double gF = 0.1;
+    private static WPI_TalonFX constantWheel = new WPI_TalonFX(6);
+    private static WPI_TalonFX changingWheel = new WPI_TalonFX(7);
+    private static WPI_VictorSPX intakeWheel = new WPI_VictorSPX(8);
+    private static final double gP = 0.1;
+    private static final double gF = 0.1;
     private static final double ticksPerRotation = 2048;
     private static final double invPollRate = 0.1;
     private static final double minutesPerSecond = 1.0 / 60.0;
     private static final double RPM = 2250;
-    public static final double constantWheelSpeed = RPM * invPollRate * minutesPerSecond * ticksPerRotation;
+    private static final double constantWheelSpeed = RPM * invPollRate * minutesPerSecond * ticksPerRotation;
+    private static final double ERROR_THRESHOLD = 5;
     // This we can preset until we find a value we like
     // Based on the situation of the motors and their placement, we might need to
     // invert this? So that the motors actually shoot the ball and dont just spin it
@@ -75,6 +76,15 @@ public class HumphreyShooter {
         System.out.println("Revving @ " + speed + ", Y-Value = " + yValue);
         return speed;
         
+    }
+
+    public boolean isReadyToFeed()
+    {
+        final boolean constantOK = Math.abs(constantWheel.getErrorDerivative()) < ERROR_THRESHOLD;
+        final boolean changingOK = Math.abs(changingWheel.getErrorDerivative()) < ERROR_THRESHOLD;
+        return constantOK && changingOK;
+        // System.out.println("Constant RPM off by " + constantWheel.getErrorDerivative());
+        // System.out.println("Changing RPM off by " + changingWheel.getErrorDerivative());
     }
 
     public void shoot(double wheelSpeed) {
