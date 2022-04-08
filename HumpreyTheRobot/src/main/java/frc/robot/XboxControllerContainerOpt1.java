@@ -73,19 +73,16 @@ public class XboxControllerContainerOpt1 implements ControllerSystem {
 
     @Override
     public boolean getIntakeReverse() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean getShooterIntakeReverse() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean getManualShooterIntake() {
-        // TODO Auto-generated method stub
         return false;
     };
 

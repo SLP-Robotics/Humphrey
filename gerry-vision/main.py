@@ -17,7 +17,7 @@ from tkinter import ttk
 sd = 0
 
 # start video stream capture
-vcap = cv2.VideoCapture(3)
+vcap = cv2.VideoCapture(2)
 path = 'C:/Users/jonas/Documents/GitHub/Humphrey/gerry-vision/visionmodels/v3.pt'
 # import desired model
 model = torch.hub.load('', 'custom', path=path, source='local')
@@ -102,7 +102,7 @@ runint = 0
 
 def put_action(action):
     global sd
-    #sd.putString('action', action)
+    sd.putString('action', action)
 
 # image processing loop
 def processing():
@@ -137,18 +137,13 @@ def processing():
         detections_previous = detections
         detections = {}
         # pull video frame-by-frame
-        try:
-            ret, frame = vcap.read()
-            cropped_image = frame[0:120, 160:320]
-        except:
-            print('error')
-            continue
+        ret, frame = vcap.read()
         # display the current frame
-        cv2.imshow("frame", cropped_image)
+        cv2.imshow("frame", frame)
 
         width = frame.shape[1]
 
-        frame_rgb = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB)
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         # inference
         results = model(frame_rgb)
 
@@ -166,10 +161,17 @@ def processing():
             obj_size = (((xmax.item() - xmin.item()) ** 2 + (ymax.item() - ymin.item()) ** 2) ** 0.5)
 
                 # visualize the center of the object with a green dot
-            center_vis = cv2.line(cropped_image, (int(xy_center[0]), int(xy_center[1])),
+            center_vis = cv2.line(frame, (int(xy_center[0]), int(xy_center[1])),
                                   (int(xy_center[0]), int(xy_center[1])),
                                   (0, 255, 0), 15)
 
+            auto_display = sd.getString('autoDisplay')
+            if auto_display == 'notOriented':
+                orient_vis = cv2.line(frame, 0, 0, 240, 240, (0, 0, 255), 15)
+            if auto_display == 'Orienting':
+                orient_vis = cv2.line(frame, 0, 0, 240, 240, (0, 255, 255), 15)
+            if auto_display == 'Oriented':
+                orient_vis = cv2.line(frame, 0, 0, 240, 240, (0, 255, 0), 15)
             # sort objects by class into a more readable format
             if c == 0:
                 size_xymid_blue.append([xy_center, obj_size])
@@ -206,7 +208,7 @@ def processing():
 
                     closestxy = split_xymid[largest_item_int]
 
-                    closest_vis = cv2.line(cropped_image, (int(closestxy[0]), int(closestxy[1])),
+                    closest_vis = cv2.line(frame, (int(closestxy[0]), int(closestxy[1])),
                                            (int(closestxy[0]), int(closestxy[1])), (0, 0, 255), 15)
 
                     # display combined images
@@ -237,7 +239,7 @@ def processing():
 
                     closestxy = split_xymid[largest_item_int]
 
-                    closest_vis = cv2.line(cropped_image, (int(closestxy[0]), int(closestxy[1])),
+                    closest_vis = cv2.line(frame, (int(closestxy[0]), int(closestxy[1])),
                                            (int(closestxy[0]), int(closestxy[1])), (255, 0, 0), 15)
 
                     # display combined images
