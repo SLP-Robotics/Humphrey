@@ -27,6 +27,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 public class Robot extends TimedRobot {
 
   public static DriveHumphrey drivehumphrey = new DriveHumphrey();
+  public static AimBot aimbot;
   public RobotContainer m_robotContainer;
   public ColorChecker cchecker = new ColorChecker();
   public int autoRuns = 0;
@@ -108,6 +109,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    aimbot = new AimBot();
     System.out.println("autoinit");
     autoStartTime = System.currentTimeMillis();
     autoRuns = 0;
@@ -125,8 +127,9 @@ public class Robot extends TimedRobot {
     // orient to goal and shoot preloaded cargo before autoCargo
     if (currentAutoTime >= (reverseTimeS * 1000)) {
       if (cchecker.ballPresent()) {
-        AimBot.orientToGoal(limelight.x, drivehumphrey);
-        if (!currentlyShooting && AimBot.orientToGoal(limelight.x, drivehumphrey)) {
+        Intake.intakeBall(false);
+        aimbot.orientToGoal(limelight.x, drivehumphrey, table);
+        if (!currentlyShooting && aimbot.orientToGoal(limelight.x, drivehumphrey, table)) {
           currentlyShooting = true;
           shootingCounter = 0;
         }
@@ -135,6 +138,7 @@ public class Robot extends TimedRobot {
 
         }
       } else {
+        Intake.intakeBall(true);
         autoCargo();
       }
 
@@ -143,6 +147,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    aimbot = new AimBot();
     shootingCounter = 0;
     System.out.println("starting teleop");
     currentlyShooting = false;
@@ -179,7 +184,7 @@ public class Robot extends TimedRobot {
         autoCargo();
       }
       if (m_robotContainer.aimBotEnabled) {
-        AimBot.orientToGoal(limelight.x, drivehumphrey);
+        aimbot.orientToGoal(limelight.x, drivehumphrey, table);
       }
     }
 

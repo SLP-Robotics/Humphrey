@@ -2,14 +2,11 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class AimBot {
     private static final float TURNING_ERROR_MARGIN = 2f;
-    NetworkTableInstance inst;
-    static NetworkTable table;
-    static NetworkTableEntry driverDisplay = table.getEntry("autoDisplay");
-    public static boolean orientToGoal(double angle, DriveHumphrey drive) {
+    public boolean orientToGoal(double angle, DriveHumphrey drive, NetworkTable table) {
+        NetworkTableEntry driverDisplay = table.getEntry("autoDisplay");
         String orientState;
         // turn the robot (control the robot)
             orientState = "notOriented";
