@@ -27,12 +27,11 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 public class Robot extends TimedRobot {
 
   private final DriveHumphrey drivehumphrey = new DriveHumphrey();
-  private final AimBot aimbot = new AimBot();
   public RobotContainer m_robotContainer;
   private final ColorChecker cchecker = new ColorChecker();
   public int autoRuns = 0;
   private long autoStartTime = 0;
-  public static final double reverseTimeS = 1;
+  public static final double reverseTimeS = 0.6;
   NetworkTableInstance inst;
   NetworkTable table;
   public static final double offsetDir = -0.3;
@@ -120,17 +119,21 @@ public class Robot extends TimedRobot {
     } else {
       // orient to goal and shoot preloaded cargo before autoCargo
       if (cchecker.ballPresent()) {
-        if (!currentlyShooting && AimBot.orientToGoal(limelight.x, drivehumphrey)) {
-          currentlyShooting = true;
-          loadingCounter = 0;
-        }
-        if (currentlyShooting) {
+        // Ball is here
+        if (!currentlyShooting) {
+          limelight.getGoalPos();
+          if (AimBot.orientToGoal(limelight.x, drivehumphrey)) {
+            currentlyShooting = true;
+            loadingCounter = 0;
+            System.out.println("Attempting to auto shoot");
+          } else {
+            System.out.println("Attempting to align");
+          }
+        } else {
           shootingRoutine();
           drivehumphrey.drive(0, 0);
         }
-        
       }
-
     }
   }
 
@@ -144,7 +147,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     limelight.getGoalPos();
-
     boolean drivingForwards = -m_robotContainer.speed > 0;
     m_robotContainer.readButtons();
     if (m_robotContainer.boostEnabled) {// Turbo mode
@@ -172,6 +174,7 @@ public class Robot extends TimedRobot {
         autoCargo();
       }
       if (m_robotContainer.aimBotEnabled) {
+        limelight.getGoalPos();
         AimBot.orientToGoal(limelight.x, drivehumphrey);
       }
     }

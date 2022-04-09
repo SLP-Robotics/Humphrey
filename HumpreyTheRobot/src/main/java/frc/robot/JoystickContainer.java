@@ -18,7 +18,7 @@ public class JoystickContainer implements ControllerSystem {
     public boolean autoCargoEnabled;
     public boolean aimBotEnabled;
     public boolean intakeInitiated;
-    final JoystickButton intakeInitiate = new JoystickButton(right, 2);
+    final JoystickButton intakeInitiate = new JoystickButton(center, 1);
     final JoystickButton shootInitiate = new JoystickButton(right, 1);
     final JoystickButton intakeReverse = new JoystickButton(right, 3);
     final JoystickButton shooterIntakeReverse = new JoystickButton(right, 5);

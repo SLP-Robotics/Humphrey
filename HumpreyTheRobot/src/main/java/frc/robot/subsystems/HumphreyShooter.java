@@ -55,7 +55,7 @@ public class HumphreyShooter {
         yValuesToSpeeds.put(15.0, 2000.0); // 66in
     }
 
-    public double getSpeed(double yValue) {
+    public double getSpeed(final double yValue) {
         Map.Entry<Double, Double> smallerEntry = yValuesToSpeeds.floorEntry(yValue);
         if (null == smallerEntry) {
             System.err.println("Goal too close to determine shooter speed");
