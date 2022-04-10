@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
   private final ColorChecker cchecker = new ColorChecker();
   public int autoRuns = 0;
   private long autoStartTime = 0;
-  public static final double reverseTimeS = 0.6;
+  public static final double reverseTimeS = 1;
   NetworkTableInstance inst;
   NetworkTable table;
   public static final double offsetDir = -0.3;
