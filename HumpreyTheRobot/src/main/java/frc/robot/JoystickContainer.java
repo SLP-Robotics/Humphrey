@@ -66,6 +66,7 @@ public class JoystickContainer implements ControllerSystem {
 
     @Override
     public boolean getIntakeInitiated() {
+        System.out.println("my intake has initiated");
         return intakeInitiate.get();
     };
 
