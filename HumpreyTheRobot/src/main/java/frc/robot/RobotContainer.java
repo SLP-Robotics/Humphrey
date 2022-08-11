@@ -9,6 +9,7 @@ public class RobotContainer {
     public boolean autoCargoEnabled;
     public boolean aimBotEnabled;
     public boolean intakeInitiated;
+    public boolean demoModeDisengaged;
 
     public double inputShooterSpeed;
     // The inputShooterSpeed will eventually be deleted and its function replaced by
@@ -41,6 +42,7 @@ public class RobotContainer {
         aimBotEnabled = controller.getAimBotEnabled();
         shootInitiated = controller.getShootInitiated();
         inputShooterSpeed = deadzone(controller.getInputShooterSpeed());
+        demoModeDisengaged = controller.getDemoModeDisengaged();
         // Absolute value to prevent the wheel from spinning backwards which could
         // cause... idk what could happen, but probably not good
         intakeInitiated = controller.getIntakeInitiated();
