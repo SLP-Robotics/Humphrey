@@ -48,7 +48,8 @@ public class RobotContainer {
         intakeInitiated = controller.getIntakeInitiated();
         if (intakeInitiated) {
             System.out.println("another testing print statement");
-         };
+        }
+        ;
         intakeReverse = controller.getIntakeReverse();
         shooterIntakeReverse = controller.getShooterIntakeReverse();
         manualShooterIntake = controller.getManualShooterIntake();
