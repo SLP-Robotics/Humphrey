@@ -46,7 +46,7 @@ public class RobotContainer {
         // Absolute value to prevent the wheel from spinning backwards which could
         // cause... idk what could happen, but probably not good
         intakeInitiated = controller.getIntakeInitiated();
-        if (intakeInitiated){
+        if (intakeInitiated) {
             System.out.println("another testing print statement");
          };
         intakeReverse = controller.getIntakeReverse();
