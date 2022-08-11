@@ -18,11 +18,13 @@ public class JoystickContainer implements ControllerSystem {
     public boolean autoCargoEnabled;
     public boolean aimBotEnabled;
     public boolean intakeInitiated;
+    public boolean demoModeDisengaged;
     final JoystickButton intakeInitiate = new JoystickButton(center, 11);
     final JoystickButton shootInitiate = new JoystickButton(right, 1);
     final JoystickButton intakeReverse = new JoystickButton(right, 3);
     final JoystickButton shooterIntakeReverse = new JoystickButton(right, 5);
     final JoystickButton manualShooterIntake = new JoystickButton(right, 4);
+    final JoystickButton demoModeOff = new JoystickButton(right, 6)
 
     public double inputShooterSpeed;
     // The inputShooterSpeed will eventually be deleted and its function replaced by
@@ -83,5 +85,10 @@ public class JoystickContainer implements ControllerSystem {
     @Override
     public boolean getManualShooterIntake() {
         return manualShooterIntake.get();
+    }
+    
+    @Override
+    public boolean getDemoModeDisengaged() {
+        return demoModeOff.get();
     }
 }
