@@ -24,7 +24,6 @@ public class XboxControllerContainerOpt1 implements ControllerSystem {
 
     public void readButtons() {
         speed = xbox.getLeftY();
-        // System.out.println(speed);
         direction = xbox.getLeftX();
         // System.out.println(direction);
         boostEnabled = xbox.getLeftStickButton();
@@ -40,6 +39,7 @@ public class XboxControllerContainerOpt1 implements ControllerSystem {
     }
 
     public double getSpeed() {
+        // System.out.println(xbox.getLeftY());
         return xbox.getLeftY();
     };
 

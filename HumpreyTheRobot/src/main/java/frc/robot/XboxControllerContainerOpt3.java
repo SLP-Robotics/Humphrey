@@ -26,6 +26,7 @@ public class XboxControllerContainerOpt3 implements ControllerSystem {
         // My very hopeful implementation of a tankDrive system using arcade drive
         // Why?
         // Because why not
+        System.out.println("xbox 3");
         speed = (xbox.getLeftY() + xbox.getRightY()) / 2;
         // System.out.println(speed);
         direction = (Math.abs(xbox.getRightY()) / -2) + (xbox.getLeftY() / 2);
