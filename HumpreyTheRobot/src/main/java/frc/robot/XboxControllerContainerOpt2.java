@@ -84,5 +84,11 @@ public class XboxControllerContainerOpt2 implements ControllerSystem {
     @Override
     public boolean getManualShooterIntake() {
         return false;
+    }
+
+    @Override
+    public boolean getDemoModeDisengaged() {
+        // TODO Auto-generated method stub
+        return false;
     };
 }

@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
   NetworkTableInstance inst;
   NetworkTable table;
   public static final double offsetDir = -0.3;
-  public static int demoModeMultiplier = 0.5;
+  public static double demoModeMultiplier = 0.5;
   // This is the offset amount for the robot's driving: must be changed when new
   // weight is added
 
@@ -150,17 +150,17 @@ public class Robot extends TimedRobot {
     limelight.getGoalPos();
     boolean drivingForwards = -m_robotContainer.speed > 0;
     m_robotContainer.readButtons();
-    if (m_robotContainer.demoModeDisengaged){
-      demoModeMultiplier = 1
+    if (m_robotContainer.demoModeDisengaged) {
+      demoModeMultiplier = 1;
     }
     if (m_robotContainer.boostEnabled) {// Turbo mode
       if (Math.abs(m_robotContainer.direction) < 0.1 && Math.abs(m_robotContainer.speed) > 0.1) {
         // v Flip sign if offset direction is backwards
-        drivehumphrey.drive(m_robotContainer.speed*demoModeMultiplier,
+        drivehumphrey.drive(m_robotContainer.speed * demoModeMultiplier,
             m_robotContainer.direction - (drivingForwards ? offsetDir : -offsetDir));
         // Drive with the offset
       } else {
-        drivehumphrey.drive(m_robotContainer.speed*demoModeMultiplier, m_robotContainer.direction);
+        drivehumphrey.drive(m_robotContainer.speed * demoModeMultiplier, m_robotContainer.direction);
         // functionally the same as driving with 0 turn
       }
     } else {
