@@ -75,17 +75,20 @@ public class HumphreyShooter {
         double speed = smallerSpeed + (speedRange * percentage);
         System.out.println("Revving @ " + speed + ", Y-Value = " + yValue);
         return speed;
-        
+
     }
 
-    public boolean isReadyToFeed()
-    {
+    public boolean isReadyToFeed() {
         final boolean constantOK = Math.abs(constantWheel.getErrorDerivative()) < ERROR_THRESHOLD;
         final boolean changingOK = Math.abs(changingWheel.getErrorDerivative()) < ERROR_THRESHOLD;
         return constantOK && changingOK;
-        // System.out.println("Constant RPM off by " + constantWheel.getErrorDerivative());
-        // System.out.println("Changing RPM off by " + changingWheel.getErrorDerivative());
+        // System.out.println("Constant RPM off by " +
+        // constantWheel.getErrorDerivative());
+        // System.out.println("Changing RPM off by " +
+        // changingWheel.getErrorDerivative());
     }
+
+    final int WHEEL_SPEED_OFFSET = 4;
 
     public void shoot(double wheelSpeed) {
         constantWheel.set(TalonFXControlMode.Velocity, constantWheelSpeed);

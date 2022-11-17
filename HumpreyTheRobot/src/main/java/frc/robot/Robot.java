@@ -179,6 +179,7 @@ public class Robot extends TimedRobot {
       }
       if (m_robotContainer.aimBotEnabled) {
         limelight.getGoalPos();
+        System.out.println("limelight x = " + limelight.x);
         AimBot.orientToGoal(limelight.x, drivehumphrey);
       }
     }

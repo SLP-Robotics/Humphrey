@@ -24,4 +24,6 @@ public interface ControllerSystem {
     public boolean getManualShooterIntake();
 
     public boolean getDemoModeDisengaged();
+    // public boolean slowSpeedOn();
+
 }
