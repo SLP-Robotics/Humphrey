@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
   NetworkTableInstance inst;
   NetworkTable table;
   public static final double offsetDir = -0.3;
-  public static double demoModeMultiplier = 0.5;
+  public static double demoModeMultiplier = 0.9;
   // This is the offset amount for the robot's driving: must be changed when new
   // weight is added
 
